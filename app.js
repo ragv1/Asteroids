@@ -7,9 +7,57 @@ class cPoint {
         this.y = y;
     }
 }
+class Ship {
+    constructor() {
+        this.x = width / 2;
+        this.y = height / 2;
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.lineWidth = 2;
+        this.color = "green";
+        this.size = 20;
+        this.rotation = 0;
+        this.rotationSpeed = 0;
+        this.side = 10;
+        this.draw = () => {
+            this.rotation += this.rotationSpeed;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = this.lineWidth;
+            ctx.beginPath();
+            // ctx.moveTo(this.x, this.y);
+            // ctx.lineTo(this.x+this.side, this.y);
+            // ctx.lineTo(this.x+this.side/2, this.y+this.side);
+            // ctx.lineTo(this.x, this.y);
+            ctx.beginPath();
+            ctx.moveTo(0, -40);
+            ctx.lineTo(40, 40);
+            ctx.lineTo(-40, 40);
+            ctx.fill();
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+        };
+        this.turnRight = () => {
+            ctx.save();
+            // ctx.translate(this.x, this.y);
+            ctx.rotate(20 * Math.PI / 180);
+            ctx.beginPath();
+            // ctx.moveTo(0,0);
+            ctx.lineTo(40, 40);
+            ctx.lineTo(-40, 40);
+            ctx.fill();
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+        };
+    }
+}
 /**
- * Asteroid Class
- */
+* Asteroid Class
+*/
 class cAsteroid {
     constructor(x = undefined, y = undefined, size = undefined, color = "white", line_width = 2) {
         this.x = 0;
@@ -146,11 +194,14 @@ var height = 620;
 var redCircle;
 var shape_array = new Array();
 var level = 0;
+var ship = new Ship();
 //INITIAL FUNCTION
 window.onload = () => {
     canvas = document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
     // redCircle = new cCircle(20,20,50,'red',2,ctx);
+    ship = new Ship();
+    window.addEventListener('keydown', turn, false);
     LoadGame();
     gameLoop();
 };
@@ -160,21 +211,17 @@ function gameLoop() {
     startGame();
 } //GAMELOOP END
 //Game Logic
-function drawCircle(origenX, origenY, r, color) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 5;
-    ctx.arc(origenX, origenY, r, 0, 2 * Math.PI);
-    ctx.stroke();
-}
 function LoadGame() {
+    loadTimer();
     loadLevel();
-    loadAsteroids();
-    loadShip();
+    loadAsteroids(level);
+    drawShip();
     loadScore();
     loadLife();
     loadPowers();
     console.log('Game loaded!!!');
+}
+function loadTimer() {
 }
 function loadLevel() {
     let currentLevel = level;
@@ -186,23 +233,44 @@ function loadAsteroids(level) {
         shape_array.push(new cAsteroid());
     }
     shape_array.push(new cCircle(20, 20, 50, 'red', 2, ctx));
-    shape_array.push(new cCircle(20, 20, 50, 'blue', 2, ctx));
+    shape_array.push(new cCircle(120, 120, 50, 'blue', 2, ctx));
     console.log("Asteroids Loaded!!!");
 }
-function loadShip() { }
+function drawShip() {
+    ship.draw();
+}
 function loadScore() { }
 function loadLife() { }
 function loadPowers() { }
 function startGame() {
     gameStage();
+    drawShip();
 }
 function gameStage() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
-    drawCircle(width / 2, height / 2, 100, 'green');
     let shape;
     for (var i = 0; i < shape_array.length; i++) {
         shape = shape_array[i];
         shape.draw();
+    }
+}
+function turn(e) {
+    var code = e.keyCode;
+    switch (code) {
+        case 37:
+            console.log("Left");
+            break; //Left key
+        case 38:
+            console.log("Up");
+            break; //Up key
+        case 39:
+            console.log("Right");
+            ship.turnRight();
+            break; //Right key
+        case 40:
+            console.log("Down");
+            break; //Down key
+        default: console.log(code); //Everything else
     }
 }

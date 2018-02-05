@@ -7,7 +7,65 @@ class cPoint {
        this.y = y;
     }
  }
-/**
+class Ship {
+    public x: number = width/2;
+    public y: number = height/2;
+    public velocityX: number = 0;
+    public velocityY: number = 0;
+    public lineWidth: number = 2;
+    public color: string = "green";
+    public size: number = 20;
+    public rotation: number = 0;
+    public rotationSpeed: number = 0;
+    private side=10;
+
+    constructor() { }
+
+
+
+    public draw = (): void => {      
+        this.rotation += this.rotationSpeed;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
+        ctx.beginPath();
+        
+      
+        // ctx.moveTo(this.x, this.y);
+        // ctx.lineTo(this.x+this.side, this.y);
+        // ctx.lineTo(this.x+this.side/2, this.y+this.side);
+        // ctx.lineTo(this.x, this.y);
+
+        ctx.beginPath();
+        ctx.moveTo(0,-40);
+        ctx.lineTo(40,40);
+        ctx.lineTo(-40,40);
+        ctx.fill();
+
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+       }
+
+       public turnRight = (): void => {
+        ctx.save();
+        // ctx.translate(this.x, this.y);
+        ctx.rotate(20*Math.PI/180);
+        ctx.beginPath();
+        // ctx.moveTo(0,0);
+        ctx.lineTo(40,40);
+        ctx.lineTo(-40,40);
+        ctx.fill();
+
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+       }
+
+}
+ /**
  * Asteroid Class
  */
 class cAsteroid implements iShape {
@@ -197,6 +255,7 @@ var height:number=620;
 var redCircle;
 var shape_array: Array<iShape> = new Array<iShape>();
 var level:number=0;
+var ship:Ship= new Ship();
 
 //INITIAL FUNCTION
 
@@ -204,6 +263,8 @@ var level:number=0;
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
     // redCircle = new cCircle(20,20,50,'red',2,ctx);
+    ship= new Ship();
+    window.addEventListener('keydown',turn,false);
     LoadGame();
     gameLoop();
  }
@@ -217,25 +278,19 @@ var level:number=0;
  }//GAMELOOP END
 
 //Game Logic
-
- function drawCircle(origenX:number,origenY:number,r:number,color:string){
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 5;
-    ctx.arc(origenX, origenY, r, 0, 2 * Math.PI);
-    ctx.stroke();
- }
-
  function LoadGame():void{
+    loadTimer();
     loadLevel(); 
-    loadAsteroids();
-    loadShip();
+    loadAsteroids(level);
+    drawShip();
     loadScore();
     loadLife();
     loadPowers();
     console.log('Game loaded!!!');
  }
-
+function loadTimer(){
+    
+}
 function loadLevel(){
     let currentLevel=level;
 }
@@ -247,11 +302,13 @@ function loadAsteroids(level?:number){
         shape_array.push(new cAsteroid());   
     }
     shape_array.push(new cCircle(20,20,50,'red',2,ctx) );
-    shape_array.push(new cCircle(20,20,50,'blue',2,ctx));
+    shape_array.push(new cCircle(120,120,50,'blue',2,ctx));
     console.log("Asteroids Loaded!!!");
 }
 
-function loadShip(){}
+function drawShip(){
+    ship.draw();
+}
 
 function loadScore(){}
 
@@ -261,12 +318,12 @@ function loadPowers(){}
 
 function startGame(){
     gameStage();
+    drawShip();
 }
 
 function gameStage(){
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
-    drawCircle(width/2,height/2,100,'green');
     
     let shape: iShape;
     for (var i: number = 0; i < shape_array.length; i++) {
@@ -274,4 +331,15 @@ function gameStage(){
         shape.draw();
     }
 
+}
+function turn(e){
+    var code = e.keyCode;
+    switch (code) {
+        case 37: console.log("Left"); break; //Left key
+        case 38: console.log("Up"); break; //Up key
+        case 39: console.log("Right");ship.turnRight(); break; //Right key
+        case 40: console.log("Down"); break; //Down key
+        default: console.log(code); //Everything else
+    }
+    
 }
