@@ -61,7 +61,7 @@ export class Ship{
     //rotation movement functions
     turn(){
         this.angle+=this.ANGLE_VELOCITY;
-        this.velocity.setDirection(this.angle);
+        // this.velocity.setDirection(this.angle);
     }
     rotate(ang){
         this.ANGLE_VELOCITY=ang;

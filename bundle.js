@@ -245,7 +245,7 @@ var Ship = /** @class */ (function () {
     //rotation movement functions
     Ship.prototype.turn = function () {
         this.angle += this.ANGLE_VELOCITY;
-        this.velocity.setDirection(this.angle);
+        // this.velocity.setDirection(this.angle);
     };
     Ship.prototype.rotate = function (ang) {
         this.ANGLE_VELOCITY = ang;
