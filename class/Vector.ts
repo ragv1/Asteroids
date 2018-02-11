@@ -14,8 +14,8 @@ export class Vector{
     // set the direction of the vector in radians
     setDirection = function(angle) {
         var magnitude = this.getMagnitude();
-    this.x = Math.cos(angle) * magnitude;
-    this.y = Math.sin(angle) * magnitude;
+        this.x = Math.cos(angle) * magnitude;
+        this.y = Math.sin(angle) * magnitude;
     };
     
     // get the magnitude of the vector

@@ -1,16 +1,56 @@
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
+var Laser_1 = require("./Laser");
 var Ship = /** @class */ (function () {
-    function Ship(x, y, ctx) {
+    function Ship(width, height, ctx, arr) {
+        var _this = this;
         this.name = 'Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
-        this.r = 20;
+        this.r = 40;
         this.angle = -Math.PI / 2;
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
-        this.pos = new Vector_1.Vector(x, y);
+        this.laserArr = [];
+        this.keyUpControls = function (e) {
+            var code = e.keyCode;
+            switch (code) {
+                case 37:
+                    _this.rotate(0);
+                    break; //Left key
+                case 38:
+                    _this.move(false);
+                    break; //Up key
+                case 39:
+                    _this.rotate(0);
+                    break; //Right key
+                default: console.log(code); //Everything else
+            }
+        };
+        this.keydownControls = function (e) {
+            var code = e.keyCode;
+            switch (code) {
+                case 37:
+                    _this.rotate(-0.05);
+                    ;
+                    break; //Left key
+                case 38:
+                    _this.move(true);
+                    break; //Up key
+                case 39:
+                    _this.rotate(0.05);
+                    break; //Right key
+                case 32:
+                    _this.shoot(_this.laserArr);
+                    break;
+                default: console.log(code); //Everything else
+            }
+        };
+        this.worldWidth = width;
+        this.worldHeight = height;
+        this.pos = new Vector_1.Vector(width / 2, height / 2);
         this.velocity = new Vector_1.Vector(0, 0);
         this.ctx = ctx;
+        this.laserArr = arr;
     }
     Ship.prototype.draw = function () {
         this.ctx.save();
@@ -18,11 +58,11 @@ var Ship = /** @class */ (function () {
         this.ctx.translate(this.pos.x, this.pos.y);
         //the rotation
         this.ctx.rotate(this.angle);
-        // the triangle
+        // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
         this.ctx.beginPath();
-        this.ctx.moveTo(0, -this.r);
-        this.ctx.lineTo(0, this.r);
-        this.ctx.lineTo(2 * this.r, 0);
+        this.ctx.moveTo(0, -this.r / 2);
+        this.ctx.lineTo(0, this.r / 2);
+        this.ctx.lineTo(this.r, 0);
         this.ctx.closePath();
         // the outline
         this.ctx.lineWidth = 10;
@@ -37,16 +77,33 @@ var Ship = /** @class */ (function () {
     };
     Ship.prototype.update = function () {
         this.pos.addTo(this.velocity);
+        if (this.pos.x > this.worldWidth + this.r + 30) {
+            this.pos.x = -this.r - 20;
+        }
+        else if (this.pos.x < -this.r - 30) {
+            this.pos.x = this.worldWidth + this.r + 20;
+        }
+        else if (this.pos.y > this.worldHeight + this.r + 30) {
+            this.pos.y = -this.r - 20;
+        }
+        else if (this.pos.y < -this.r - 30) {
+            this.pos.y = this.worldHeight + this.r + 20;
+        }
         if (this.isMoving === true) {
             this.boost();
         }
-        //create friction
+        //inherent ship friction
         this.velocity.multiplyBy(0.99);
+    };
+    Ship.prototype.setPosition = function (newWidth, newHeight) {
+        this.pos.x -= (this.worldWidth - newWidth);
+        this.pos.y -= (this.worldHeight - newHeight);
+        this.worldWidth = newWidth;
+        this.worldHeight = newHeight;
     };
     //rotation movement functions
     Ship.prototype.turn = function () {
         this.angle += this.ANGLE_VELOCITY;
-        // this.velocity.setDirection(this.angle);
     };
     Ship.prototype.rotate = function (ang) {
         this.ANGLE_VELOCITY = ang;
@@ -59,6 +116,9 @@ var Ship = /** @class */ (function () {
     };
     Ship.prototype.move = function (b) {
         this.isMoving = b;
+    };
+    Ship.prototype.shoot = function (arr) {
+        arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
     };
     return Ship;
 }());

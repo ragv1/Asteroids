@@ -1,4 +1,5 @@
 import { Vector } from "./Vector";
+import { Laser } from "./Laser";
 
 export class Ship{
     public name='Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
@@ -6,15 +7,20 @@ export class Ship{
     private acc:Vector;
     public pos:Vector;
     private ctx;
-    private r =20;
-    private angle=-Math.PI/2;
+    private r =40;
+    public angle=-Math.PI/2;
     private ANGLE_VELOCITY=0;
     private isMoving=false;
-    
-    constructor(x:number,y:number,ctx:any){
-        this.pos = new Vector(x,y);
+    private worldWidth;
+    private worldHeight;
+    private laserArr:any[]=[];
+    constructor(width:number,height:number,ctx:any,arr){
+        this.worldWidth=width;
+        this.worldHeight=height;
+        this.pos = new Vector(width/2,height/2);
         this.velocity= new Vector(0,0)
         this.ctx=ctx;
+        this.laserArr=arr;
     }
 
 
@@ -27,11 +33,11 @@ export class Ship{
         //the rotation
         this.ctx.rotate(this.angle);
 
-        // the triangle
+        // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
         this.ctx.beginPath();
-        this.ctx.moveTo(0, -this.r);
-        this.ctx.lineTo(0,this.r);
-        this.ctx.lineTo(2*this.r,0);
+        this.ctx.moveTo(0, -this.r/2);
+        this.ctx.lineTo(0,this.r/2);
+        this.ctx.lineTo(this.r,0);
         this.ctx.closePath();
         
         // the outline
@@ -53,15 +59,35 @@ export class Ship{
     
     update(){
         this.pos.addTo(this.velocity);
+        
+        if(this.pos.x > this.worldWidth+this.r+30){
+            this.pos.x= -this.r-20;
+
+        }else if(this.pos.x < -this.r-30){
+            this.pos.x=this.worldWidth+this.r+20
+
+        }else if(this.pos.y> this.worldHeight+this.r+30){
+            this.pos.y=-this.r-20;
+
+        }else if(this.pos.y< -this.r-30){
+            this.pos.y=this.worldHeight+this.r+20;
+        }
+
         if(this.isMoving===true){this.boost()}
-        //create friction
+        
+        //inherent ship friction
         this.velocity.multiplyBy(0.99);
+    }
+    setPosition(newWidth:number,newHeight:number){
+        this.pos.x-= (this.worldWidth-newWidth);
+        this.pos.y-= (this.worldHeight-newHeight);
+        this.worldWidth=newWidth;
+        this.worldHeight=newHeight;
     }
 
     //rotation movement functions
     turn(){
         this.angle+=this.ANGLE_VELOCITY;
-        // this.velocity.setDirection(this.angle);
     }
     rotate(ang){
         this.ANGLE_VELOCITY=ang;
@@ -75,6 +101,31 @@ export class Ship{
     }
     move(b:boolean){
         this.isMoving=b;
+    }
+    shoot(arr){
+        arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r))
+    }
+
+    keyUpControls= (e) => {
+        var code = e.keyCode;
+        switch (code) {
+            case 37: this.rotate(0); break; //Left key
+            case 38: this.move(false); break; //Up key
+            case 39: this.rotate(0); break; //Right key
+            default: console.log(code); //Everything else
+        }
+        
+    }
+    keydownControls= (e) =>{
+        var code = e.keyCode;
+        switch (code) {
+            case 37: this.rotate(-0.05);; break; //Left key
+            case 38: this.move(true);   break; //Up key
+            case 39: this.rotate(0.05); break; //Right key
+            case 32: this.shoot(this.laserArr);break;
+            default: console.log(code); //Everything else
+        }
+        
     }
 
 
