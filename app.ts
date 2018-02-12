@@ -1,6 +1,8 @@
 import { Ship } from "./class/ship";
 import { Asteroid } from "./class/Asteroid";
 import { Laser } from "./class/Laser";
+import { Score } from "./class/Score";
+import { Screen  } from "./class/Intro";
 var width;
 var height;
 var ctx;
@@ -8,6 +10,16 @@ var canvas;
 var ship:Ship;
 var asteroids:Asteroid[]=[];
 var laser:Laser[]=[];
+var score:Score;
+var counter:number=0;
+var introScreen:Screen;
+var idAnimation;
+var idGameLoop;
+var idGameOver;
+var info:Screen;
+var info2:Screen;
+var endScreen:Screen;
+var endInfo:Screen;
 
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
@@ -29,6 +41,7 @@ function attachEventListeners(){
     canvas.tabIndex = 1;
     canvas.addEventListener("keydown",ship.keydownControls);
     canvas.addEventListener("keyup",ship.keyUpControls);
+    canvas.addEventListener("click",startGame);
 //  console.log(canvas );
 }
 function createShip(){
@@ -42,19 +55,97 @@ function createAsteroids(num){
     }
     console.log('Asteroids Created Sucessfuly: ',num);   
 }
-
-// THE GAME
-function gameLoop() {
-    requestAnimationFrame(gameLoop);
+function createScore(fontSize:string,fontType:string,color:string,width:number,height:number,ctx){
+    score= new Score(fontSize,fontType,color,width,height,ctx)
+}
+function endGame(){
+    cancelAnimationFrame(idGameLoop);
+    score.disableScore();
+    ship.reset();
+    canvas.removeEventListener("keydown",ship.keydownControls);
+    canvas.removeEventListener("keyup",ship.keyUpControls);
+    canvas.addEventListener("click",restartGame);
+    gameOver();
+    return true;
+}
+function restartGame(){
+    cancelAnimationFrame(idGameOver);
+    loadGame(false);
+}
+function gameOver(){
+    idGameOver= requestAnimationFrame(gameOver);
+    endScreen.draw();
+    endInfo.draw();
+}
+function startGame(){
+    canvas.removeEventListener("click",startGame);
+    cancelAnimationFrame(idAnimation);
+    gameLoop();
+}
+function gameIntro(){
+    idAnimation = requestAnimationFrame(gameIntro);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    for (let i = 0; i < asteroids.length; i++) {
+       asteroids[i].draw();
+       asteroids[i].update();
+   }
+    introScreen.draw();
+    info.draw();
+    info2.draw();
+}
+function loadGame(newGame:boolean){
+    if(!newGame){
+        canvas.removeEventListener("click",restartGame);
+        asteroids=[];
+    }
+    createCanvas();
+    setCanvasSize();
+    canvas = <HTMLCanvasElement>document.getElementById('cnvs');
+    ctx = canvas.getContext("2d");
+    createShip();
+    attachEventListeners();
+    createAsteroids(5);
+    createScore('30px','Consolas','white',width,height,ctx);
+    introScreen=new Screen('40px','red',width/6,height/3,ctx,'Click en la pantalla para empezar');
+    info= new Screen('30px','white',width/6,height/2,ctx,'Use las flechas para Moverse');
+    info2= new Screen('30px','white',width/6,height/1.8,ctx,'Use la tecla de Espacio para disparar');
+    endScreen=new Screen('40px','red',width/6,height/3,ctx,'Game Over');
+    endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
+    gameIntro();
+}
+var frame=0;
+// THE GAME
+function gameLoop() {
+   idGameLoop= requestAnimationFrame(gameLoop);
+    frame++;
+    console.log(Math.round(frame/60));
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, width, height);
+    //Chek for lives
+    if(score.lives<=0){
+        endGame();
+     }
     // Asteroids Drawing loop
     for (let i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
+    }
+    for (let i = 0; i < asteroids.length; i++) {
         if( asteroids[i].hit(ship.pos) ){
-            // TODO: delete one live
-            console.log('minus one live');
+            if(score.lives<=0){
+                endGame();
+            }else{
+                let copyAsteroid = asteroids[i];
+                copyAsteroid.resetPos();
+                asteroids.splice(i,1);
+                ship.reset();
+                asteroids.push(copyAsteroid);
+                score.reduce();
+                break;
+            }
+            
         }
     }
     //lasers drawing loop
@@ -63,6 +154,7 @@ function gameLoop() {
         laser[i].update();
         for (let j = asteroids.length-1; j >=0; j--) {
             if (asteroids[j].break(laser[i]) ){
+                score.increment();
                 let pos = asteroids[j].pos;
                 let r= asteroids[j].r;
                 asteroids.splice(j,1);
@@ -83,16 +175,11 @@ function gameLoop() {
     ship.draw();
     ship.update();
     ship.turn();
+    // Score Drawing and updating counter
+    score.update();
  }
- 
- //Preload necesary stuff for the game
- window.onload = () => {
-    createCanvas();
-    setCanvasSize();
-    canvas = <HTMLCanvasElement>document.getElementById('cnvs');
-    ctx = canvas.getContext("2d");
-    createShip();
-    attachEventListeners();
-    createAsteroids(5);
-    gameLoop();
- }
+
+//Preload necesary stuff for the game
+window.onload = () => {
+    loadGame(true);
+}

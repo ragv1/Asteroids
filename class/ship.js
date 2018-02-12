@@ -11,6 +11,7 @@ var Ship = /** @class */ (function () {
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
         this.laserArr = [];
+        this.unableShip = false;
         this.keyUpControls = function (e) {
             var code = e.keyCode;
             switch (code) {
@@ -102,6 +103,13 @@ var Ship = /** @class */ (function () {
         this.worldWidth = newWidth;
         this.worldHeight = newHeight;
     };
+    Ship.prototype.reset = function () {
+        this.pos.x = this.worldWidth / 2;
+        this.pos.y = this.worldHeight / 2;
+        this.velocity = new Vector_1.Vector(0, 0);
+        this.angle = -Math.PI / 2;
+        this.move(false);
+    };
     //rotation movement functions
     Ship.prototype.turn = function () {
         this.angle += this.ANGLE_VELOCITY;
@@ -120,6 +128,9 @@ var Ship = /** @class */ (function () {
     };
     Ship.prototype.shoot = function (arr) {
         arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
+    };
+    Ship.prototype.disableShip = function () {
+        this.unableShip = true;
     };
     return Ship;
 }());

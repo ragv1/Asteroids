@@ -87,6 +87,10 @@ var Asteroid = /** @class */ (function () {
         var d = this.distance(shipPos, this.pos);
         return d <= this.r + 30;
     };
+    Asteroid.prototype.resetPos = function () {
+        this.pos.x = -30 - Math.random() * 30;
+        this.pos.y = -30 - Math.random() * 30;
+    };
     return Asteroid;
 }());
 exports.Asteroid = Asteroid;

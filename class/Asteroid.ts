@@ -96,4 +96,8 @@ export class Asteroid{
         let d = this.distance(shipPos,this.pos); 
         return d<=this.r+30;
     }
+    resetPos(){
+        this.pos.x= -30 - Math.random()*30;
+        this.pos.y= -30 - Math.random()*30
+    }
 }

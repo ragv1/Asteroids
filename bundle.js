@@ -3,6 +3,8 @@
 exports.__esModule = true;
 var ship_1 = require("./class/ship");
 var Asteroid_1 = require("./class/Asteroid");
+var Score_1 = require("./class/Score");
+var Intro_1 = require("./class/Intro");
 var width;
 var height;
 var ctx;
@@ -10,6 +12,16 @@ var canvas;
 var ship;
 var asteroids = [];
 var laser = [];
+var score;
+var counter = 0;
+var introScreen;
+var idAnimation;
+var idGameLoop;
+var idGameOver;
+var info;
+var info2;
+var endScreen;
+var endInfo;
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -30,6 +42,7 @@ function attachEventListeners() {
     canvas.tabIndex = 1;
     canvas.addEventListener("keydown", ship.keydownControls);
     canvas.addEventListener("keyup", ship.keyUpControls);
+    canvas.addEventListener("click", startGame);
     //  console.log(canvas );
 }
 function createShip() {
@@ -43,18 +56,96 @@ function createAsteroids(num) {
     }
     console.log('Asteroids Created Sucessfuly: ', num);
 }
-// THE GAME
-function gameLoop() {
-    requestAnimationFrame(gameLoop);
+function createScore(fontSize, fontType, color, width, height, ctx) {
+    score = new Score_1.Score(fontSize, fontType, color, width, height, ctx);
+}
+function endGame() {
+    cancelAnimationFrame(idGameLoop);
+    score.disableScore();
+    ship.reset();
+    canvas.removeEventListener("keydown", ship.keydownControls);
+    canvas.removeEventListener("keyup", ship.keyUpControls);
+    canvas.addEventListener("click", restartGame);
+    gameOver();
+    return true;
+}
+function restartGame() {
+    cancelAnimationFrame(idGameOver);
+    loadGame(false);
+}
+function gameOver() {
+    idGameOver = requestAnimationFrame(gameOver);
+    endScreen.draw();
+    endInfo.draw();
+}
+function startGame() {
+    canvas.removeEventListener("click", startGame);
+    cancelAnimationFrame(idAnimation);
+    gameLoop();
+}
+function gameIntro() {
+    idAnimation = requestAnimationFrame(gameIntro);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    for (var i = 0; i < asteroids.length; i++) {
+        asteroids[i].draw();
+        asteroids[i].update();
+    }
+    introScreen.draw();
+    info.draw();
+    info2.draw();
+}
+function loadGame(newGame) {
+    if (!newGame) {
+        canvas.removeEventListener("click", restartGame);
+        asteroids = [];
+    }
+    createCanvas();
+    setCanvasSize();
+    canvas = document.getElementById('cnvs');
+    ctx = canvas.getContext("2d");
+    createShip();
+    attachEventListeners();
+    createAsteroids(5);
+    createScore('30px', 'Consolas', 'white', width, height, ctx);
+    introScreen = new Intro_1.Screen('40px', 'red', width / 6, height / 3, ctx, 'Click en la pantalla para empezar');
+    info = new Intro_1.Screen('30px', 'white', width / 6, height / 2, ctx, 'Use las flechas para Moverse');
+    info2 = new Intro_1.Screen('30px', 'white', width / 6, height / 1.8, ctx, 'Use la tecla de Espacio para disparar');
+    endScreen = new Intro_1.Screen('40px', 'red', width / 6, height / 3, ctx, 'Game Over');
+    endInfo = new Intro_1.Screen('30px', 'yellow', width / 6, height / 2.6, ctx, 'Click to Restart');
+    gameIntro();
+}
+var frame = 0;
+// THE GAME
+function gameLoop() {
+    idGameLoop = requestAnimationFrame(gameLoop);
+    frame++;
+    console.log(Math.round(frame / 60));
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, width, height);
+    //Chek for lives
+    if (score.lives <= 0) {
+        endGame();
+    }
     // Asteroids Drawing loop
     for (var i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
+    }
+    for (var i = 0; i < asteroids.length; i++) {
         if (asteroids[i].hit(ship.pos)) {
-            // TODO: delete one live
-            console.log('minus one live');
+            if (score.lives <= 0) {
+                endGame();
+            }
+            else {
+                var copyAsteroid = asteroids[i];
+                copyAsteroid.resetPos();
+                asteroids.splice(i, 1);
+                ship.reset();
+                asteroids.push(copyAsteroid);
+                score.reduce();
+                break;
+            }
         }
     }
     //lasers drawing loop
@@ -63,6 +154,7 @@ function gameLoop() {
         laser[i].update();
         for (var j = asteroids.length - 1; j >= 0; j--) {
             if (asteroids[j]["break"](laser[i])) {
+                score.increment();
                 var pos = asteroids[j].pos;
                 var r = asteroids[j].r;
                 asteroids.splice(j, 1);
@@ -84,20 +176,15 @@ function gameLoop() {
     ship.draw();
     ship.update();
     ship.turn();
+    // Score Drawing and updating counter
+    score.update();
 }
 //Preload necesary stuff for the game
 window.onload = function () {
-    createCanvas();
-    setCanvasSize();
-    canvas = document.getElementById('cnvs');
-    ctx = canvas.getContext("2d");
-    createShip();
-    attachEventListeners();
-    createAsteroids(5);
-    gameLoop();
+    loadGame(true);
 };
 
-},{"./class/Asteroid":2,"./class/ship":5}],2:[function(require,module,exports){
+},{"./class/Asteroid":2,"./class/Intro":3,"./class/Score":5,"./class/ship":7}],2:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -187,11 +274,37 @@ var Asteroid = /** @class */ (function () {
         var d = this.distance(shipPos, this.pos);
         return d <= this.r + 30;
     };
+    Asteroid.prototype.resetPos = function () {
+        this.pos.x = -30 - Math.random() * 30;
+        this.pos.y = -30 - Math.random() * 30;
+    };
     return Asteroid;
 }());
 exports.Asteroid = Asteroid;
 
-},{"./Vector":4}],3:[function(require,module,exports){
+},{"./Vector":6}],3:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+var Screen = /** @class */ (function () {
+    function Screen(fontSize, color, x, y, ctx, message) {
+        this.fontSize = fontSize;
+        this.fontType = 'Consolas';
+        this.xpos = x;
+        this.ypos = y;
+        this.ctx = ctx;
+        this.color = color;
+        this.message = message;
+    }
+    Screen.prototype.draw = function () {
+        this.ctx.font = this.fontSize + " " + this.fontType;
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillText(this.message, this.xpos, this.ypos);
+    };
+    return Screen;
+}());
+exports.Screen = Screen;
+
+},{}],4:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -241,7 +354,47 @@ var Laser = /** @class */ (function () {
 }());
 exports.Laser = Laser;
 
-},{"./Vector":4}],4:[function(require,module,exports){
+},{"./Vector":6}],5:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+var Score = /** @class */ (function () {
+    function Score(fontSize, fontType, color, worldWidth, worldHeight, ctx) {
+        this.score = 0;
+        this.lives = 5;
+        this.unableScore = false;
+        this.fontSize = fontSize;
+        this.fontType = fontType;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
+        this.ctx = ctx;
+        this.score = 0;
+        this.color = color;
+    }
+    Score.prototype.draw = function () {
+        this.ctx.font = this.fontSize + " " + this.fontType;
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillText('Puntos: ' + this.score + '\nVidas: ' + this.lives, this.worldWidth * 0.1, this.worldHeight * 0.1);
+    };
+    Score.prototype.update = function () {
+        this.draw();
+    };
+    Score.prototype.increment = function () {
+        if (this.unableScore) {
+            return;
+        }
+        this.score++;
+    };
+    Score.prototype.reduce = function () {
+        this.lives--;
+    };
+    Score.prototype.disableScore = function () {
+        this.unableScore = true;
+    };
+    return Score;
+}());
+exports.Score = Score;
+
+},{}],6:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector = /** @class */ (function () {
@@ -341,7 +494,7 @@ var Vector = /** @class */ (function () {
 }());
 exports.Vector = Vector;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -355,6 +508,7 @@ var Ship = /** @class */ (function () {
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
         this.laserArr = [];
+        this.unableShip = false;
         this.keyUpControls = function (e) {
             var code = e.keyCode;
             switch (code) {
@@ -446,6 +600,13 @@ var Ship = /** @class */ (function () {
         this.worldWidth = newWidth;
         this.worldHeight = newHeight;
     };
+    Ship.prototype.reset = function () {
+        this.pos.x = this.worldWidth / 2;
+        this.pos.y = this.worldHeight / 2;
+        this.velocity = new Vector_1.Vector(0, 0);
+        this.angle = -Math.PI / 2;
+        this.move(false);
+    };
     //rotation movement functions
     Ship.prototype.turn = function () {
         this.angle += this.ANGLE_VELOCITY;
@@ -465,8 +626,11 @@ var Ship = /** @class */ (function () {
     Ship.prototype.shoot = function (arr) {
         arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
     };
+    Ship.prototype.disableShip = function () {
+        this.unableShip = true;
+    };
     return Ship;
 }());
 exports.Ship = Ship;
 
-},{"./Laser":3,"./Vector":4}]},{},[1]);
+},{"./Laser":4,"./Vector":6}]},{},[1]);

@@ -14,6 +14,7 @@ export class Ship{
     private worldWidth;
     private worldHeight;
     private laserArr:any[]=[];
+    private unableShip:boolean=false;
     constructor(width:number,height:number,ctx:any,arr){
         this.worldWidth=width;
         this.worldHeight=height;
@@ -83,6 +84,13 @@ export class Ship{
         this.worldWidth=newWidth;
         this.worldHeight=newHeight;
     }
+    reset(){
+        this.pos.x=this.worldWidth/2;
+        this.pos.y=this.worldHeight/2;
+        this.velocity=new Vector(0,0);
+        this.angle= -Math.PI/2;
+        this.move(false);
+    }
 
     //rotation movement functions
     turn(){
@@ -91,7 +99,6 @@ export class Ship{
     rotate(ang){
         this.ANGLE_VELOCITY=ang;
     }
-
     //linear movement functions
     boost(){
         let force = new Vector(Math.cos(this.angle), Math.sin(this.angle) );
@@ -104,7 +111,10 @@ export class Ship{
     shoot(arr){
         arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r))
     }
-
+    disableShip(){
+        this.unableShip=true;
+    }
+    
     keyUpControls= (e) => {
         var code = e.keyCode;
         switch (code) {
@@ -124,7 +134,6 @@ export class Ship{
             case 39: this.rotate(0.05); break; //Right key
             default: console.log(code); //Everything else
         }
-        
     }
 
 
