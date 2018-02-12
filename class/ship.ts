@@ -7,7 +7,7 @@ export class Ship{
     private acc:Vector;
     public pos:Vector;
     private ctx;
-    private r =40;
+    private r =20;
     public angle=-Math.PI/2;
     private ANGLE_VELOCITY=0;
     private isMoving=false;
@@ -35,11 +35,12 @@ export class Ship{
 
         // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
         this.ctx.beginPath();
-        this.ctx.moveTo(0, -this.r/2);
-        this.ctx.lineTo(0,this.r/2);
+        this.ctx.moveTo(-this.r, this.r);
+        this.ctx.lineTo(-this.r/2,0);
+        this.ctx.lineTo(-this.r,-this.r);
         this.ctx.lineTo(this.r,0);
         this.ctx.closePath();
-        
+       
         // the outline
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';

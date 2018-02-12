@@ -350,7 +350,7 @@ var Ship = /** @class */ (function () {
     function Ship(width, height, ctx, arr) {
         var _this = this;
         this.name = 'Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
-        this.r = 40;
+        this.r = 20;
         this.angle = -Math.PI / 2;
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
@@ -404,8 +404,9 @@ var Ship = /** @class */ (function () {
         this.ctx.rotate(this.angle);
         // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
         this.ctx.beginPath();
-        this.ctx.moveTo(0, -this.r / 2);
-        this.ctx.lineTo(0, this.r / 2);
+        this.ctx.moveTo(-this.r, this.r);
+        this.ctx.lineTo(-this.r / 2, 0);
+        this.ctx.lineTo(-this.r, -this.r);
         this.ctx.lineTo(this.r, 0);
         this.ctx.closePath();
         // the outline
