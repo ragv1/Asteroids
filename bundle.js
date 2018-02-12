@@ -367,6 +367,9 @@ var Ship = /** @class */ (function () {
                 case 39:
                     _this.rotate(0);
                     break; //Right key
+                case 32:
+                    _this.shoot(_this.laserArr);
+                    break;
                 default: console.log(code); //Everything else
             }
         };
@@ -383,9 +386,6 @@ var Ship = /** @class */ (function () {
                 case 39:
                     _this.rotate(0.05);
                     break; //Right key
-                case 32:
-                    _this.shoot(_this.laserArr);
-                    break;
                 default: console.log(code); //Everything else
             }
         };
@@ -402,7 +402,7 @@ var Ship = /** @class */ (function () {
         this.ctx.translate(this.pos.x, this.pos.y);
         //the rotation
         this.ctx.rotate(this.angle);
-        // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
+        // the triangle                       
         this.ctx.beginPath();
         this.ctx.moveTo(-this.r, this.r);
         this.ctx.lineTo(-this.r / 2, 0);

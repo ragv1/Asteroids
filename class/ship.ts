@@ -33,14 +33,13 @@ export class Ship{
         //the rotation
         this.ctx.rotate(this.angle);
 
-        // the triangle                      TODO: DRAW THE SHIP WITH ORIGIN IN THE MIDDLE  
+        // the triangle                       
         this.ctx.beginPath();
         this.ctx.moveTo(-this.r, this.r);
         this.ctx.lineTo(-this.r/2,0);
         this.ctx.lineTo(-this.r,-this.r);
         this.ctx.lineTo(this.r,0);
         this.ctx.closePath();
-       
         // the outline
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';
@@ -55,7 +54,6 @@ export class Ship{
 
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
-    
     }
     
     update(){
@@ -113,6 +111,7 @@ export class Ship{
             case 37: this.rotate(0); break; //Left key
             case 38: this.move(false); break; //Up key
             case 39: this.rotate(0); break; //Right key
+            case 32: this.shoot(this.laserArr);break;
             default: console.log(code); //Everything else
         }
         
@@ -123,7 +122,6 @@ export class Ship{
             case 37: this.rotate(-0.05);; break; //Left key
             case 38: this.move(true);   break; //Up key
             case 39: this.rotate(0.05); break; //Right key
-            case 32: this.shoot(this.laserArr);break;
             default: console.log(code); //Everything else
         }
         
