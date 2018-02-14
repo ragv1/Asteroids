@@ -125,6 +125,7 @@ function levelUp() {
         score.lives++;
     }
     createAsteroids(level + 5);
+    score.incrementLevel();
 }
 // THE GAME
 function gameLoop() {
@@ -543,7 +544,7 @@ var Ship = /** @class */ (function () {
                     break; //spacebar
                 case 90:
                     _this.shoot(_this.laserArr);
-                    break; // the 's' key
+                    break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };
