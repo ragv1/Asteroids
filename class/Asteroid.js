@@ -5,6 +5,7 @@ var Asteroid = /** @class */ (function () {
     function Asteroid(width, height, ctx, r, x, y) {
         this.name = 'Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
         this.r = 15 + Math.random() * 30;
+        this.shootPrecision = 10;
         //array of radius
         this.arrR = [];
         this.angle = 0;
@@ -78,7 +79,7 @@ var Asteroid = /** @class */ (function () {
     };
     Asteroid.prototype["break"] = function (laser) {
         var d = this.distance(laser.pos, this.pos);
-        return d <= this.r;
+        return d <= this.r + this.shootPrecision;
     };
     Asteroid.prototype.distance = function (v1, v2) {
         return Math.sqrt(Math.pow((v1.x - v2.x), 2) + Math.pow((v1.y - v2.y), 2));

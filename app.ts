@@ -138,7 +138,8 @@ function gameLoop() {
         endGame();
      }
    
-    for (let i = 0; i < asteroids.length; i++) {
+    for (let i = asteroids.length-1; i >= 0; i--) {
+        if(asteroids[i].r<=5){asteroids.splice(i,1);continue;}
         asteroids[i].draw();
         asteroids[i].update();
         if( asteroids[i].hit(ship.pos) ){
@@ -155,6 +156,7 @@ function gameLoop() {
             }
             
         }
+        
     }
     //Check if the level is completed
     if(asteroids.length<1){ level++; levelUp();}
@@ -175,9 +177,6 @@ function gameLoop() {
                 break;
             } else if(laser[i].outSide()){
                 laser.splice(i,1);
-                break;
-            }else if(asteroids[j].r<=5){            // asteroid minimum size
-                asteroids.splice(j,1);
                 break;
             }
         }

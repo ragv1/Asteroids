@@ -7,6 +7,7 @@ export class Asteroid{
     public pos:Vector;
     private ctx;
     public r = 15 + Math.random()* 30;
+    private shootPrecision:number=10;
     //array of radius
     private arrR=[];
     private angle=0;
@@ -87,7 +88,7 @@ export class Asteroid{
         ctx.closePath();
     }
     break(laser){
-        let d = this.distance(laser.pos,this.pos); return d<=this.r;
+        let d = this.distance(laser.pos,this.pos); return d<=this.r+this.shootPrecision;
     }
     distance(v1,v2){
         return Math.sqrt( Math.pow((v1.x-v2.x),2) + Math.pow( (v1.y-v2.y),2))

@@ -137,7 +137,11 @@ function gameLoop() {
     if (score.lives <= 0) {
         endGame();
     }
-    for (var i = 0; i < asteroids.length; i++) {
+    for (var i = asteroids.length - 1; i >= 0; i--) {
+        if (asteroids[i].r <= 5) {
+            asteroids.splice(i, 1);
+            continue;
+        }
         asteroids[i].draw();
         asteroids[i].update();
         if (asteroids[i].hit(ship.pos)) {
@@ -177,10 +181,6 @@ function gameLoop() {
             }
             else if (laser[i].outSide()) {
                 laser.splice(i, 1);
-                break;
-            }
-            else if (asteroids[j].r <= 5) {
-                asteroids.splice(j, 1);
                 break;
             }
         }
