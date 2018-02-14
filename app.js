@@ -124,6 +124,7 @@ function levelUp() {
         score.lives++;
     }
     createAsteroids(level + 5);
+    score.incrementLevel();
 }
 // THE GAME
 function gameLoop() {
