@@ -20,6 +20,7 @@ var info:Screen;
 var info2:Screen;
 var endScreen:Screen;
 var endInfo:Screen;
+var level:number=0;
 
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
@@ -127,12 +128,10 @@ function gameLoop() {
     if(score.lives<=0){
         endGame();
      }
-    // Asteroids Drawing loop
+   
     for (let i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
-    }
-    for (let i = 0; i < asteroids.length; i++) {
         if( asteroids[i].hit(ship.pos) ){
             if(score.lives<=0){
                 endGame();

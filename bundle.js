@@ -22,6 +22,7 @@ var info;
 var info2;
 var endScreen;
 var endInfo;
+var level = 0;
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');

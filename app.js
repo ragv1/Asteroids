@@ -21,6 +21,7 @@ var info;
 var info2;
 var endScreen;
 var endInfo;
+var level = 0;
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -128,12 +129,9 @@ function gameLoop() {
     if (score.lives <= 0) {
         endGame();
     }
-    // Asteroids Drawing loop
     for (var i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
-    }
-    for (var i = 0; i < asteroids.length; i++) {
         if (asteroids[i].hit(ship.pos)) {
             if (score.lives <= 0) {
                 endGame();
