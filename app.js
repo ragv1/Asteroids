@@ -22,6 +22,7 @@ var info2;
 var endScreen;
 var endInfo;
 var level = 0;
+var frame = 0;
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -117,7 +118,10 @@ function loadGame(newGame) {
     endInfo = new Intro_1.Screen('30px', 'yellow', width / 6, height / 2.6, ctx, 'Click to Restart');
     gameIntro();
 }
-var frame = 0;
+function levelUp() {
+    level++;
+    createAsteroids(level + 5);
+}
 // THE GAME
 function gameLoop() {
     idGameLoop = requestAnimationFrame(gameLoop);
@@ -146,6 +150,11 @@ function gameLoop() {
                 break;
             }
         }
+    }
+    //Check if the level is completed
+    if (asteroids.length < 1) {
+        level++;
+        levelUp();
     }
     //lasers drawing loop
     for (var i = laser.length - 1; i >= 0; i--) {

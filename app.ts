@@ -21,6 +21,7 @@ var info2:Screen;
 var endScreen:Screen;
 var endInfo:Screen;
 var level:number=0;
+var frame=0;
 
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
@@ -115,7 +116,11 @@ function loadGame(newGame:boolean){
     endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
     gameIntro();
 }
-var frame=0;
+function levelUp(){
+    level++
+    createAsteroids(level+5);
+    
+}
 // THE GAME
 function gameLoop() {
    idGameLoop= requestAnimationFrame(gameLoop);
@@ -147,6 +152,9 @@ function gameLoop() {
             
         }
     }
+    //Check if the level is completed
+    if(asteroids.length<1){ level++; levelUp();}
+
     //lasers drawing loop
     for (let i = laser.length-1; i >=0; i--) {
         laser[i].draw();
