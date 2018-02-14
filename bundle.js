@@ -22,6 +22,8 @@ var info;
 var info2;
 var endScreen;
 var endInfo;
+var level = 0;
+var frame = 0;
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -96,11 +98,13 @@ function gameIntro() {
     info2.draw();
 }
 function loadGame(newGame) {
+    if (newGame) {
+        createCanvas();
+    }
     if (!newGame) {
         canvas.removeEventListener("click", restartGame);
         asteroids = [];
     }
-    createCanvas();
     setCanvasSize();
     canvas = document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
@@ -115,24 +119,27 @@ function loadGame(newGame) {
     endInfo = new Intro_1.Screen('30px', 'yellow', width / 6, height / 2.6, ctx, 'Click to Restart');
     gameIntro();
 }
-var frame = 0;
+function levelUp() {
+    level++;
+    if (score.lives <= 100) {
+        score.lives++;
+    }
+    createAsteroids(level + 5);
+}
 // THE GAME
 function gameLoop() {
     idGameLoop = requestAnimationFrame(gameLoop);
-    frame++;
-    console.log(Math.round(frame / 60));
+    // frame++;
+    // console.log(Math.round(frame/60));
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
     //Chek for lives
     if (score.lives <= 0) {
         endGame();
     }
-    // Asteroids Drawing loop
     for (var i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
-    }
-    for (var i = 0; i < asteroids.length; i++) {
         if (asteroids[i].hit(ship.pos)) {
             if (score.lives <= 0) {
                 endGame();
@@ -147,6 +154,11 @@ function gameLoop() {
                 break;
             }
         }
+    }
+    //Check if the level is completed
+    if (asteroids.length < 1) {
+        level++;
+        levelUp();
     }
     //lasers drawing loop
     for (var i = laser.length - 1; i >= 0; i--) {
@@ -362,6 +374,7 @@ var Score = /** @class */ (function () {
         this.score = 0;
         this.lives = 5;
         this.unableScore = false;
+        this.level = 0;
         this.fontSize = fontSize;
         this.fontType = fontType;
         this.worldWidth = worldWidth;
@@ -374,6 +387,7 @@ var Score = /** @class */ (function () {
         this.ctx.font = this.fontSize + " " + this.fontType;
         this.ctx.fillStyle = this.color;
         this.ctx.fillText('Puntos: ' + this.score + '\nVidas: ' + this.lives, this.worldWidth * 0.1, this.worldHeight * 0.1);
+        this.ctx.fillText('Nivel: ' + this.level, this.worldWidth * 0.1, this.worldHeight * 0.2);
     };
     Score.prototype.update = function () {
         this.draw();
@@ -383,6 +397,9 @@ var Score = /** @class */ (function () {
             return;
         }
         this.score++;
+    };
+    Score.prototype.incrementLevel = function () {
+        this.level++;
     };
     Score.prototype.reduce = function () {
         this.lives--;
@@ -523,7 +540,10 @@ var Ship = /** @class */ (function () {
                     break; //Right key
                 case 32:
                     _this.shoot(_this.laserArr);
-                    break;
+                    break; //spacebar
+                case 90:
+                    _this.shoot(_this.laserArr);
+                    break; // the 's' key
                 default: console.log(code); //Everything else
             }
         };

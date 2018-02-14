@@ -20,6 +20,8 @@ var info:Screen;
 var info2:Screen;
 var endScreen:Screen;
 var endInfo:Screen;
+var level:number=0;
+var frame=0;
 
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
@@ -95,11 +97,11 @@ function gameIntro(){
     info2.draw();
 }
 function loadGame(newGame:boolean){
+    if(newGame){createCanvas()}
     if(!newGame){
         canvas.removeEventListener("click",restartGame);
         asteroids=[];
     }
-    createCanvas();
     setCanvasSize();
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
@@ -114,12 +116,19 @@ function loadGame(newGame:boolean){
     endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
     gameIntro();
 }
-var frame=0;
+function levelUp(){
+    level++;
+    if(score.lives<=100){ 
+        score.lives++;
+    }
+    createAsteroids(level+5);
+
+}
 // THE GAME
 function gameLoop() {
    idGameLoop= requestAnimationFrame(gameLoop);
-    frame++;
-    console.log(Math.round(frame/60));
+    // frame++;
+    // console.log(Math.round(frame/60));
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
@@ -127,12 +136,10 @@ function gameLoop() {
     if(score.lives<=0){
         endGame();
      }
-    // Asteroids Drawing loop
+   
     for (let i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         asteroids[i].update();
-    }
-    for (let i = 0; i < asteroids.length; i++) {
         if( asteroids[i].hit(ship.pos) ){
             if(score.lives<=0){
                 endGame();
@@ -148,6 +155,9 @@ function gameLoop() {
             
         }
     }
+    //Check if the level is completed
+    if(asteroids.length<1){ level++; levelUp();}
+
     //lasers drawing loop
     for (let i = laser.length-1; i >=0; i--) {
         laser[i].draw();

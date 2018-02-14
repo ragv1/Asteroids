@@ -8,6 +8,7 @@ export class Score{
     private ctx;
     private color;
     private unableScore:boolean=false;
+    private level:number=0;
 
     constructor(fontSize:string, fontType:string, color:string, worldWidth:number, worldHeight:number,ctx) {
         this.fontSize = fontSize;
@@ -22,6 +23,7 @@ export class Score{
         this.ctx.font = this.fontSize + " " + this.fontType;
         this.ctx.fillStyle = this.color;
         this.ctx.fillText('Puntos: '+this.score+'\nVidas: '+this.lives, this.worldWidth*0.1, this.worldHeight*0.1)
+        this.ctx.fillText('Nivel: '+this.level, this.worldWidth*0.1, this.worldHeight*0.2)
     }
     update(){  
         this.draw();
@@ -29,6 +31,9 @@ export class Score{
     increment(){
         if(this.unableScore){return} 
         this.score++
+    }
+    incrementLevel(){
+        this.level++;
     }
     reduce(){
         this.lives--;
