@@ -121,7 +121,8 @@ export class Ship{
             case 37: this.rotate(0); break; //Left key
             case 38: this.move(false); break; //Up key
             case 39: this.rotate(0); break; //Right key
-            case 32: this.shoot(this.laserArr);break;
+            case 32: this.shoot(this.laserArr);break; //spacebar
+            case 90: this.shoot(this.laserArr);break; // the 'z' key
             default: console.log(code); //Everything else
         }
         

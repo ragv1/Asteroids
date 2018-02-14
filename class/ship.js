@@ -26,7 +26,10 @@ var Ship = /** @class */ (function () {
                     break; //Right key
                 case 32:
                     _this.shoot(_this.laserArr);
-                    break;
+                    break; //spacebar
+                case 90:
+                    _this.shoot(_this.laserArr);
+                    break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };

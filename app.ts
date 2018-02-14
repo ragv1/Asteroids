@@ -127,8 +127,8 @@ function levelUp(){
 // THE GAME
 function gameLoop() {
    idGameLoop= requestAnimationFrame(gameLoop);
-    frame++;
-    console.log(Math.round(frame/60));
+    // frame++;
+    // console.log(Math.round(frame/60));
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
