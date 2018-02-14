@@ -120,6 +120,9 @@ function loadGame(newGame) {
 }
 function levelUp() {
     level++;
+    if (score.lives <= 100) {
+        score.lives++;
+    }
     createAsteroids(level + 5);
 }
 // THE GAME

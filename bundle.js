@@ -121,6 +121,9 @@ function loadGame(newGame) {
 }
 function levelUp() {
     level++;
+    if (score.lives <= 100) {
+        score.lives++;
+    }
     createAsteroids(level + 5);
 }
 // THE GAME
@@ -371,6 +374,7 @@ var Score = /** @class */ (function () {
         this.score = 0;
         this.lives = 5;
         this.unableScore = false;
+        this.level = 0;
         this.fontSize = fontSize;
         this.fontType = fontType;
         this.worldWidth = worldWidth;
@@ -383,6 +387,7 @@ var Score = /** @class */ (function () {
         this.ctx.font = this.fontSize + " " + this.fontType;
         this.ctx.fillStyle = this.color;
         this.ctx.fillText('Puntos: ' + this.score + '\nVidas: ' + this.lives, this.worldWidth * 0.1, this.worldHeight * 0.1);
+        this.ctx.fillText('Nivel: ' + this.level, this.worldWidth * 0.1, this.worldHeight * 0.2);
     };
     Score.prototype.update = function () {
         this.draw();
@@ -392,6 +397,9 @@ var Score = /** @class */ (function () {
             return;
         }
         this.score++;
+    };
+    Score.prototype.incrementLevel = function () {
+        this.level++;
     };
     Score.prototype.reduce = function () {
         this.lives--;
