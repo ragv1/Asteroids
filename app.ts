@@ -95,11 +95,11 @@ function gameIntro(){
     info2.draw();
 }
 function loadGame(newGame:boolean){
+    if(newGame){createCanvas()}
     if(!newGame){
         canvas.removeEventListener("click",restartGame);
         asteroids=[];
     }
-    createCanvas();
     setCanvasSize();
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
