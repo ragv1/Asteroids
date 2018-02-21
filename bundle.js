@@ -5,6 +5,7 @@ var ship_1 = require("./class/ship");
 var Asteroid_1 = require("./class/Asteroid");
 var Score_1 = require("./class/Score");
 var Intro_1 = require("./class/Intro");
+var background_1 = require("./class/background");
 var width;
 var height;
 var ctx;
@@ -24,6 +25,11 @@ var endScreen;
 var endInfo;
 var level = 0;
 var frame = 0;
+var background;
+function createBackground(context, width, height, starts) {
+    var bg = new background_1.Background(context, width, height, starts);
+    background = bg.draw();
+}
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -108,6 +114,7 @@ function loadGame(newGame) {
     setCanvasSize();
     canvas = document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
+    createBackground(ctx, width, height);
     createShip();
     attachEventListeners();
     createAsteroids(5);
@@ -134,6 +141,7 @@ function gameLoop() {
     // console.log(Math.round(frame/60));
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(background, 0, 0);
     //Chek for lives
     if (score.lives <= 0) {
         endGame();
@@ -197,7 +205,7 @@ window.onload = function () {
     loadGame(true);
 };
 
-},{"./class/Asteroid":2,"./class/Intro":3,"./class/Score":5,"./class/ship":7}],2:[function(require,module,exports){
+},{"./class/Asteroid":2,"./class/Intro":3,"./class/Score":5,"./class/background":7,"./class/ship":8}],2:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -514,6 +522,43 @@ var Vector = /** @class */ (function () {
 exports.Vector = Vector;
 
 },{}],7:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+var Background = /** @class */ (function () {
+    function Background(context, width, height, stars) {
+        this.stars = 500;
+        this.colorrange = [0, 60, 240];
+        this.context = context;
+        this.width = width;
+        this.height = height;
+        this.stars = stars ? stars : this.stars;
+    }
+    Background.prototype.draw = function () {
+        var buffer = document.createElement('canvas');
+        buffer.width = this.width;
+        buffer.height = this.height;
+        var context = buffer.getContext('2d');
+        for (var i = 0; i < this.stars; i++) {
+            var x = Math.random() * this.width;
+            var y = Math.random() * this.height;
+            var radius = Math.random() * 1.2;
+            var hue = this.colorrange[this.getRandom(0, this.colorrange.length - 1)];
+            var sat = this.getRandom(50, 100);
+            context.beginPath();
+            context.arc(x, y, radius, 0, 360);
+            context.fillStyle = "hsl(" + hue + ", " + sat + "%, 88%)";
+            context.fill();
+        }
+        return buffer;
+    };
+    Background.prototype.getRandom = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    return Background;
+}());
+exports.Background = Background;
+
+},{}],8:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");

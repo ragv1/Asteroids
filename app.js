@@ -4,6 +4,7 @@ var ship_1 = require("./class/ship");
 var Asteroid_1 = require("./class/Asteroid");
 var Score_1 = require("./class/Score");
 var Intro_1 = require("./class/Intro");
+var background_1 = require("./class/background");
 var width;
 var height;
 var ctx;
@@ -23,6 +24,11 @@ var endScreen;
 var endInfo;
 var level = 0;
 var frame = 0;
+var background;
+function createBackground(context, width, height, starts) {
+    var bg = new background_1.Background(context, width, height, starts);
+    background = bg.draw();
+}
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -107,6 +113,7 @@ function loadGame(newGame) {
     setCanvasSize();
     canvas = document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
+    createBackground(ctx, width, height);
     createShip();
     attachEventListeners();
     createAsteroids(5);
@@ -133,6 +140,7 @@ function gameLoop() {
     // console.log(Math.round(frame/60));
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(background, 0, 0);
     //Chek for lives
     if (score.lives <= 0) {
         endGame();

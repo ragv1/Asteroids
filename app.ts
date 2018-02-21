@@ -3,6 +3,7 @@ import { Asteroid } from "./class/Asteroid";
 import { Laser } from "./class/Laser";
 import { Score } from "./class/Score";
 import { Screen  } from "./class/Intro";
+import { Background } from "./class/background";
 var width;
 var height;
 var ctx;
@@ -22,7 +23,11 @@ var endScreen:Screen;
 var endInfo:Screen;
 var level:number=0;
 var frame=0;
-
+var background;
+function createBackground(context,width,height,starts?){
+    let bg = new Background(context,width,height,starts);
+    background = bg.draw();
+}
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
     canvas.setAttribute('id','cnvs');
@@ -105,6 +110,7 @@ function loadGame(newGame:boolean){
     setCanvasSize();
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
+    createBackground(ctx,width,height);
     createShip();
     attachEventListeners();
     createAsteroids(5);
@@ -133,6 +139,7 @@ function gameLoop() {
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(background,0,0);
     //Chek for lives
     if(score.lives<=0){
         endGame();
