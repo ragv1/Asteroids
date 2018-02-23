@@ -13,7 +13,7 @@ export class Background{
         this.stars= stars?stars:this.stars;
     }
 
-    draw(){
+    draw():HTMLCanvasElement{
         let buffer = document.createElement('canvas');
         buffer.width=this.width;
         buffer.height=this.height;

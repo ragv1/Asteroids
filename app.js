@@ -152,7 +152,7 @@ function gameLoop() {
         }
         asteroids[i].draw();
         asteroids[i].update();
-        if (asteroids[i].hit(ship.pos)) {
+        if (asteroids[i].hit(ship.pos, ship.r)) {
             if (score.lives <= 0) {
                 endGame();
             }

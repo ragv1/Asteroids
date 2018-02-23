@@ -6,25 +6,38 @@ var Ship = /** @class */ (function () {
     function Ship(width, height, ctx, arr) {
         var _this = this;
         this.name = 'Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
-        this.r = 20;
+        this.r = 10;
         this.angle = -Math.PI / 2;
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
         this.laserArr = [];
         this.unableShip = false;
         this.keyUpControls = function (e) {
+            e.preventDefault();
             var code = e.keyCode;
             switch (code) {
                 case 37:
                     _this.rotate(0);
                     break; //Left key
+                case 65:
+                    _this.rotate(0);
+                    break; //the 'a' key
                 case 38:
+                    _this.move(false);
+                    break; //Up key
+                case 87:
                     _this.move(false);
                     break; //Up key
                 case 39:
                     _this.rotate(0);
                     break; //Right key
+                case 68:
+                    _this.rotate(0);
+                    break; // the 'w' key
                 case 32:
+                    _this.shoot(_this.laserArr);
+                    break; //spacebar
+                case 13:
                     _this.shoot(_this.laserArr);
                     break; //spacebar
                 case 90:
@@ -34,18 +47,28 @@ var Ship = /** @class */ (function () {
             }
         };
         this.keydownControls = function (e) {
+            e.preventDefault();
             var code = e.keyCode;
             switch (code) {
                 case 37:
                     _this.rotate(-0.05);
                     ;
                     break; //Left key
+                case 65:
+                    _this.rotate(-0.05);
+                    break; //the 'a' key
                 case 38:
+                    _this.move(true);
+                    break; //Up key
+                case 87:
                     _this.move(true);
                     break; //Up key
                 case 39:
                     _this.rotate(0.05);
                     break; //Right key
+                case 68:
+                    _this.rotate(0.05);
+                    break; // the 'w' key
                 default: console.log(code); //Everything else
             }
         };
@@ -77,6 +100,14 @@ var Ship = /** @class */ (function () {
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
+        //the impact zone
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, this.r + 10, 0, 2 * Math.PI);
+        // the outline
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = '#666666';
+        this.ctx.closePath();
+        this.ctx.stroke();
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
     };

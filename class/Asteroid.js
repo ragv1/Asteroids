@@ -13,6 +13,7 @@ var Asteroid = /** @class */ (function () {
         this.isMoving = false;
         this.magnitude = 1 + (Math.random() * 1);
         this.sides = 6 + Math.floor((Math.random() * 11));
+        this.asteroidOffset = 30;
         this.worldWidth = width;
         this.worldHeight = height;
         var angle = Math.PI * 2 * Math.random();
@@ -84,9 +85,9 @@ var Asteroid = /** @class */ (function () {
     Asteroid.prototype.distance = function (v1, v2) {
         return Math.sqrt(Math.pow((v1.x - v2.x), 2) + Math.pow((v1.y - v2.y), 2));
     };
-    Asteroid.prototype.hit = function (shipPos) {
+    Asteroid.prototype.hit = function (shipPos, shipR) {
         var d = this.distance(shipPos, this.pos);
-        return d <= this.r + 30;
+        return d <= this.r - shipR + this.asteroidOffset;
     };
     Asteroid.prototype.resetPos = function () {
         this.pos.x = -30 - Math.random() * 30;

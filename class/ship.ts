@@ -7,7 +7,7 @@ export class Ship{
     private acc:Vector;
     public pos:Vector;
     private ctx;
-    private r =20;
+    public r =10;
     public angle=-Math.PI/2;
     private ANGLE_VELOCITY=0;
     private isMoving=false;
@@ -41,6 +41,7 @@ export class Ship{
         this.ctx.lineTo(-this.r,-this.r);
         this.ctx.lineTo(this.r,0);
         this.ctx.closePath();
+
         // the outline
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';
@@ -52,6 +53,18 @@ export class Ship{
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
+
+     
+        //the impact zone
+        this.ctx.beginPath();
+        this.ctx.arc(0,0,this.r+10,0,2*Math.PI);
+         // the outline
+         this.ctx.lineWidth = 1;
+         this.ctx.strokeStyle = '#666666';
+        this.ctx.closePath();
+        this.ctx.stroke();
+        
+       
 
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
@@ -116,23 +129,37 @@ export class Ship{
     }
     
     keyUpControls= (e) => {
+        e.preventDefault();
         var code = e.keyCode;
         switch (code) {
             case 37: this.rotate(0); break; //Left key
+            case 65: this.rotate(0); break; //the 'a' key
+            
             case 38: this.move(false); break; //Up key
+            case 87: this.move(false); break; //Up key
+
             case 39: this.rotate(0); break; //Right key
+            case 68: this.rotate(0); break; // the 'w' key
+
             case 32: this.shoot(this.laserArr);break; //spacebar
+            case 13: this.shoot(this.laserArr);break; //spacebar
             case 90: this.shoot(this.laserArr);break; // the 'z' key
             default: console.log(code); //Everything else
         }
         
     }
     keydownControls= (e) =>{
+        e.preventDefault();
         var code = e.keyCode;
         switch (code) {
             case 37: this.rotate(-0.05);; break; //Left key
+            case 65: this.rotate(-0.05); break; //the 'a' key
+
             case 38: this.move(true);   break; //Up key
+            case 87: this.move(true); break; //Up key
+
             case 39: this.rotate(0.05); break; //Right key
+            case 68: this.rotate(0.05); break; // the 'w' key
             default: console.log(code); //Everything else
         }
     }

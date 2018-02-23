@@ -17,6 +17,7 @@ export class Asteroid{
     private worldWidth;
     private worldHeight;
     private sides= 6 + Math.floor((Math.random()*11));
+    private asteroidOffset=30;
     constructor(width:number,height:number,ctx:any,r?:number,x?:number,y?:number){
         this.worldWidth=width;
         this.worldHeight=height;
@@ -93,9 +94,9 @@ export class Asteroid{
     distance(v1,v2){
         return Math.sqrt( Math.pow((v1.x-v2.x),2) + Math.pow( (v1.y-v2.y),2))
     }
-    hit(shipPos){
+    hit(shipPos,shipR){
         let d = this.distance(shipPos,this.pos); 
-        return d<=this.r+30;
+        return d<=this.r-shipR+this.asteroidOffset;
     }
     resetPos(){
         this.pos.x= -30 - Math.random()*30;

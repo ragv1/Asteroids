@@ -149,7 +149,7 @@ function gameLoop() {
         if(asteroids[i].r<=5){asteroids.splice(i,1);continue;}
         asteroids[i].draw();
         asteroids[i].update();
-        if( asteroids[i].hit(ship.pos) ){
+        if( asteroids[i].hit(ship.pos,ship.r) ){
             if(score.lives<=0){
                 endGame();
             }else{
