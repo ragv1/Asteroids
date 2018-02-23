@@ -8,7 +8,7 @@ export class Score{
     private ctx;
     private color;
     private unableScore:boolean=false;
-    private level:number=0;
+    private level:number=1;
 
     constructor(fontSize:string, fontType:string, color:string, worldWidth:number, worldHeight:number,ctx) {
         this.fontSize = fontSize;
