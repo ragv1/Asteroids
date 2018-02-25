@@ -133,30 +133,30 @@ function gameLoop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
     //Chek for lives
-    if(score.lives<=0){
-        endGame();
-     }
+    // if(score.lives<=0){
+    //     endGame();
+    //  }
    
     for (let i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
-        asteroids[i].update();
-        if( asteroids[i].hit(ship.pos) ){
-            if(score.lives<=0){
-                endGame();
-            }else{
-                let copyAsteroid = asteroids[i];
-                copyAsteroid.resetPos();
-                asteroids.splice(i,1);
-                ship.reset();
-                asteroids.push(copyAsteroid);
-                score.reduce();
-                break;
-            }
+        // asteroids[i].update();
+        // if( asteroids[i].hit(ship.pos) ){
+        //     if(score.lives<=0){
+        //         endGame();
+        //     }else{
+        //         let copyAsteroid = asteroids[i];
+        //         copyAsteroid.resetPos();
+        //         asteroids.splice(i,1);
+        //         ship.reset();
+        //         asteroids.push(copyAsteroid);
+        //         score.reduce();
+        //         break;
+        //     }
             
-        }
+        // }
     }
     //Check if the level is completed
-    if(asteroids.length<1){ level++; levelUp();}
+    if(asteroids.length<1){ levelUp();}
 
     //lasers drawing loop
     for (let i = laser.length-1; i >=0; i--) {
