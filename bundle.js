@@ -58,7 +58,7 @@ function createShip() {
     console.log(ship.name);
 }
 function createAsteroids(num) {
-    num = num ? num : 10;
+    // num= num? num:10;
     for (var i = 0; i < num; i++) {
         asteroids.push(new Asteroid_1.Asteroid(width, height, ctx));
     }
@@ -127,11 +127,10 @@ function loadGame(newGame) {
     gameIntro();
 }
 function levelUp() {
-    level++;
     if (score.lives <= 100) {
         score.lives++;
     }
-    createAsteroids(level + 5);
+    createAsteroids(score.level + 5);
     score.incrementLevel();
 }
 // THE GAME
@@ -153,7 +152,7 @@ function gameLoop() {
         }
         asteroids[i].draw();
         asteroids[i].update();
-        if (asteroids[i].hit(ship.pos, ship.r)) {
+        if (asteroids[i].hit(ship.fakePos, ship.r)) {
             if (score.lives <= 0) {
                 endGame();
             }
@@ -170,7 +169,6 @@ function gameLoop() {
     }
     //Check if the level is completed
     if (asteroids.length < 1) {
-        level++;
         levelUp();
     }
     //lasers drawing loop
@@ -574,6 +572,8 @@ var Ship = /** @class */ (function () {
         this.isMoving = false;
         this.laserArr = [];
         this.unableShip = false;
+        this.FAKE_POS = { x: -2000, y: -2000 };
+        this.invencible = false;
         this.keyUpControls = function (e) {
             e.preventDefault();
             var code = e.keyCode;
@@ -637,6 +637,7 @@ var Ship = /** @class */ (function () {
         this.worldWidth = width;
         this.worldHeight = height;
         this.pos = new Vector_1.Vector(width / 2, height / 2);
+        this.fakePos = this.pos;
         this.velocity = new Vector_1.Vector(0, 0);
         this.ctx = ctx;
         this.laserArr = arr;
@@ -667,7 +668,7 @@ var Ship = /** @class */ (function () {
         this.ctx.arc(0, 0, this.r + 10, 0, 2 * Math.PI);
         // the outline
         this.ctx.lineWidth = 1;
-        this.ctx.strokeStyle = '#666666';
+        this.ctx.strokeStyle = this.invencible ? '#ff0000' : '#666666';
         this.ctx.closePath();
         this.ctx.stroke();
         // we’re done with the rotating so restore the unrotated context
@@ -705,6 +706,7 @@ var Ship = /** @class */ (function () {
         this.velocity = new Vector_1.Vector(0, 0);
         this.angle = -Math.PI / 2;
         this.move(false);
+        this.disableShip(5000 /*disable for 5 seconds*/);
     };
     //rotation movement functions
     Ship.prototype.turn = function () {
@@ -725,8 +727,14 @@ var Ship = /** @class */ (function () {
     Ship.prototype.shoot = function (arr) {
         arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
     };
-    Ship.prototype.disableShip = function () {
-        this.unableShip = true;
+    Ship.prototype.disableShip = function (timeMs) {
+        var _this = this;
+        setTimeout(function () {
+            _this.fakePos = _this.pos;
+            _this.invencible = false;
+        }, timeMs);
+        this.fakePos = this.FAKE_POS;
+        this.invencible = true;
     };
     return Ship;
 }());

@@ -15,10 +15,14 @@ export class Ship{
     private worldHeight;
     private laserArr:any[]=[];
     private unableShip:boolean=false;
+    public fakePos;
+    private FAKE_POS={x:-2000,y:-2000};
+    private invencible=false;
     constructor(width:number,height:number,ctx:any,arr){
         this.worldWidth=width;
         this.worldHeight=height;
         this.pos = new Vector(width/2,height/2);
+        this.fakePos=this.pos;
         this.velocity= new Vector(0,0)
         this.ctx=ctx;
         this.laserArr=arr;
@@ -60,7 +64,7 @@ export class Ship{
         this.ctx.arc(0,0,this.r+10,0,2*Math.PI);
          // the outline
          this.ctx.lineWidth = 1;
-         this.ctx.strokeStyle = '#666666';
+         this.ctx.strokeStyle =this.invencible?'#ff0000':'#666666';
         this.ctx.closePath();
         this.ctx.stroke();
         
@@ -103,6 +107,7 @@ export class Ship{
         this.velocity=new Vector(0,0);
         this.angle= -Math.PI/2;
         this.move(false);
+        this.disableShip(5000 /*disable for 5 seconds*/);
     }
 
     //rotation movement functions
@@ -124,8 +129,13 @@ export class Ship{
     shoot(arr){
         arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r))
     }
-    disableShip(){
-        this.unableShip=true;
+    disableShip(timeMs:number){
+        setTimeout(() => {
+            this.fakePos=this.pos;
+            this.invencible=false;
+        }, timeMs);
+        this.fakePos=this.FAKE_POS;
+        this.invencible=true;
     }
     
     keyUpControls= (e) => {
