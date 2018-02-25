@@ -56,7 +56,7 @@ function createShip(){
     console.log(ship.name);
 }
 function createAsteroids(num){
-    num= num? num:10;
+    // num= num? num:10;
     for (let i = 0; i < num; i++) {
         asteroids.push(new Asteroid(width,height,ctx) );
     }
@@ -123,11 +123,10 @@ function loadGame(newGame:boolean){
     gameIntro();
 }
 function levelUp(){
-    level++;
     if(score.lives<=100){ 
         score.lives++;
     }
-    createAsteroids(level+5);
+    createAsteroids(score.level+5);
     score.incrementLevel();
 
 }
@@ -166,7 +165,7 @@ function gameLoop() {
         
     }
     //Check if the level is completed
-    if(asteroids.length<1){ level++; levelUp();}
+    if(asteroids.length<1){ levelUp();}
 
     //lasers drawing loop
     for (let i = laser.length-1; i >=0; i--) {
