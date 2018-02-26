@@ -2,5 +2,8 @@
     "compileOnSave": true,
     "compilerOptions": {
         "watch": true
-    }
+        
+    },"exclude": [
+        "node_modules"
+    ]
 }

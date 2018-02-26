@@ -4,8 +4,8 @@ var Score = /** @class */ (function () {
     function Score(fontSize, fontType, color, worldWidth, worldHeight, ctx) {
         this.score = 0;
         this.lives = 5;
+        this.level = 1;
         this.unableScore = false;
-        this.level = 0;
         this.fontSize = fontSize;
         this.fontType = fontType;
         this.worldWidth = worldWidth;
