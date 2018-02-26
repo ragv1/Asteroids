@@ -71,6 +71,7 @@ var Ship = /** @class */ (function () {
                 case 68:
                     _this.rotate(0.05);
                     break; // the 'w' key
+                // case 90: this.shoot(this.laserArr);break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };
@@ -83,8 +84,9 @@ var Ship = /** @class */ (function () {
         this.laserArr = arr;
     }
     Ship.prototype.draw = function () {
-        this.ctx.save();
         // save the unrotated context of the canvas so we can restore it later
+        this.ctx.save();
+        // translate the axis to this position
         this.ctx.translate(this.pos.x, this.pos.y);
         //the rotation
         this.ctx.rotate(this.angle);
@@ -99,7 +101,8 @@ var Ship = /** @class */ (function () {
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';
         // the fill color
-        this.ctx.fillStyle = "#FFCC00";
+        this.ctx.fillStyle = this.invencible ? '' : '#FFCC00';
+        // this.ctx.fillStyle = "#FFCC00";
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
@@ -177,5 +180,5 @@ var Ship = /** @class */ (function () {
         this.invencible = true;
     };
     return Ship;
-}());
+}()); //END SHIP CLASS
 exports.Ship = Ship;

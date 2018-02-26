@@ -4,6 +4,7 @@ import { Laser } from "./class/Laser";
 import { Score } from "./class/Score";
 import { Screen  } from "./class/Intro";
 import { Background } from "./class/background";
+import { Token } from "./class/Tokens";
 var width;
 var height;
 var ctx;
@@ -24,6 +25,7 @@ var endInfo:Screen;
 var level:number=0;
 var frame=0;
 var background;
+var shieldToken;
 function createBackground(context,width,height,starts?){
     let bg = new Background(context,width,height,starts);
     background = bg.draw();
@@ -106,6 +108,7 @@ function loadGame(newGame:boolean){
     if(!newGame){
         canvas.removeEventListener("click",restartGame);
         asteroids=[];
+        laser=[];
     }
     setCanvasSize();
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
@@ -120,6 +123,7 @@ function loadGame(newGame:boolean){
     info2= new Screen('30px','white',width/6,height/1.8,ctx,'Use la tecla de Espacio para disparar');
     endScreen=new Screen('40px','red',width/6,height/3,ctx,'Game Over');
     endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
+    shieldToken= new Token('E',width,height,ctx,'green');
     gameIntro();
 }
 function levelUp(){
@@ -132,18 +136,19 @@ function levelUp(){
 }
 // THE GAME
 function gameLoop() {
-   idGameLoop= requestAnimationFrame(gameLoop);
-    // frame++;
-    // console.log(Math.round(frame/60));
-
+    idGameLoop= requestAnimationFrame(gameLoop);
+    
+    // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(background,0,0);
+    
     //Chek for lives
     if(score.lives<=0){
         endGame();
-     }
-   
+    }
+    
+    //Asteroids drawing, breaking loop
     for (let i = asteroids.length-1; i >= 0; i--) {
         if(asteroids[i].r<=5){asteroids.splice(i,1);continue;}
         asteroids[i].draw();
@@ -158,16 +163,15 @@ function gameLoop() {
                 ship.reset();
                 asteroids.push(copyAsteroid);
                 score.reduce();
-                break;
             }
-            
+ 
         }
         
     }
     //Check if the level is completed
-    if(asteroids.length<1){ levelUp();}
+    if(asteroids.length<1){ levelUp();ship.reset()}
 
-    //lasers drawing loop
+    //lasers drawing loop, increase score
     for (let i = laser.length-1; i >=0; i--) {
         laser[i].draw();
         laser[i].update();
@@ -187,10 +191,13 @@ function gameLoop() {
             }
         }
     }
-   
+    // Ship drawing
     ship.draw();
     ship.update();
     ship.turn();
+    //Drawing the token
+    shieldToken.draw();
+    shieldToken.update();
     // Score Drawing and updating counter
     score.update();
  }

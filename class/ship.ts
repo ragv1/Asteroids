@@ -15,7 +15,7 @@ export class Ship{
     private worldHeight;
     private laserArr:any[]=[];
     private unableShip:boolean=false;
-    public fakePos;
+    public fakePos; // we use this to give invulnerability to the ship
     private FAKE_POS={x:-2000,y:-2000};
     private invencible=false;
     constructor(width:number,height:number,ctx:any,arr){
@@ -30,11 +30,12 @@ export class Ship{
 
 
     draw(){
-        this.ctx.save(); 
         // save the unrotated context of the canvas so we can restore it later
+        this.ctx.save(); 
+        
+        // translate the axis to this position
         this.ctx.translate(this.pos.x,this.pos.y);
 
-        
         //the rotation
         this.ctx.rotate(this.angle);
 
@@ -48,28 +49,26 @@ export class Ship{
 
         // the outline
         this.ctx.lineWidth = 10;
-        this.ctx.strokeStyle = '#666666';
+        this.ctx.strokeStyle ='#666666';
         
         // the fill color
-        this.ctx.fillStyle = "#FFCC00";
+        this.ctx.fillStyle =this.invencible?'':'#FFCC00';
+        // this.ctx.fillStyle = "#FFCC00";
         
-
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
 
-     
         //the impact zone
         this.ctx.beginPath();
         this.ctx.arc(0,0,this.r+10,0,2*Math.PI);
-         // the outline
-         this.ctx.lineWidth = 1;
-         this.ctx.strokeStyle =this.invencible?'#ff0000':'#666666';
+
+        // the outline
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle =this.invencible?'#ff0000':'#666666';
         this.ctx.closePath();
         this.ctx.stroke();
-        
-       
-
+ 
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
     }
@@ -170,10 +169,10 @@ export class Ship{
 
             case 39: this.rotate(0.05); break; //Right key
             case 68: this.rotate(0.05); break; // the 'w' key
+            // case 90: this.shoot(this.laserArr);break; // the 'z' key
             default: console.log(code); //Everything else
         }
     }
 
 
-
-}
+}//END SHIP CLASS

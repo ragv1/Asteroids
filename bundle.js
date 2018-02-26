@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var ship_1 = require("./class/ship");
@@ -6,6 +6,7 @@ var Asteroid_1 = require("./class/Asteroid");
 var Score_1 = require("./class/Score");
 var Intro_1 = require("./class/Intro");
 var background_1 = require("./class/background");
+var Tokens_1 = require("./class/Tokens");
 var width;
 var height;
 var ctx;
@@ -26,6 +27,7 @@ var endInfo;
 var level = 0;
 var frame = 0;
 var background;
+var shieldToken;
 function createBackground(context, width, height, starts) {
     var bg = new background_1.Background(context, width, height, starts);
     background = bg.draw();
@@ -110,6 +112,7 @@ function loadGame(newGame) {
     if (!newGame) {
         canvas.removeEventListener("click", restartGame);
         asteroids = [];
+        laser = [];
     }
     setCanvasSize();
     canvas = document.getElementById('cnvs');
@@ -124,6 +127,7 @@ function loadGame(newGame) {
     info2 = new Intro_1.Screen('30px', 'white', width / 6, height / 1.8, ctx, 'Use la tecla de Espacio para disparar');
     endScreen = new Intro_1.Screen('40px', 'red', width / 6, height / 3, ctx, 'Game Over');
     endInfo = new Intro_1.Screen('30px', 'yellow', width / 6, height / 2.6, ctx, 'Click to Restart');
+    shieldToken = new Tokens_1.Token('E', width, height, ctx, 'green');
     gameIntro();
 }
 function levelUp() {
@@ -136,8 +140,7 @@ function levelUp() {
 // THE GAME
 function gameLoop() {
     idGameLoop = requestAnimationFrame(gameLoop);
-    // frame++;
-    // console.log(Math.round(frame/60));
+    // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(background, 0, 0);
@@ -145,6 +148,7 @@ function gameLoop() {
     if (score.lives <= 0) {
         endGame();
     }
+    //Asteroids drawing, breaking loop
     for (var i = asteroids.length - 1; i >= 0; i--) {
         if (asteroids[i].r <= 5) {
             asteroids.splice(i, 1);
@@ -163,15 +167,15 @@ function gameLoop() {
                 ship.reset();
                 asteroids.push(copyAsteroid);
                 score.reduce();
-                break;
             }
         }
     }
     //Check if the level is completed
     if (asteroids.length < 1) {
         levelUp();
+        ship.reset();
     }
-    //lasers drawing loop
+    //lasers drawing loop, increase score
     for (var i = laser.length - 1; i >= 0; i--) {
         laser[i].draw();
         laser[i].update();
@@ -192,9 +196,13 @@ function gameLoop() {
             }
         }
     }
+    // Ship drawing
     ship.draw();
     ship.update();
     ship.turn();
+    //Drawing the token
+    shieldToken.draw();
+    shieldToken.update();
     // Score Drawing and updating counter
     score.update();
 }
@@ -203,7 +211,7 @@ window.onload = function () {
     loadGame(true);
 };
 
-},{"./class/Asteroid":2,"./class/Intro":3,"./class/Score":5,"./class/background":7,"./class/ship":8}],2:[function(require,module,exports){
+},{"./class/Asteroid":2,"./class/Intro":3,"./class/Score":5,"./class/Tokens":6,"./class/background":8,"./class/ship":9}],2:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -303,7 +311,7 @@ var Asteroid = /** @class */ (function () {
 }());
 exports.Asteroid = Asteroid;
 
-},{"./Vector":6}],3:[function(require,module,exports){
+},{"./Vector":7}],3:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Screen = /** @class */ (function () {
@@ -375,7 +383,7 @@ var Laser = /** @class */ (function () {
 }());
 exports.Laser = Laser;
 
-},{"./Vector":6}],5:[function(require,module,exports){
+},{"./Vector":7}],5:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Score = /** @class */ (function () {
@@ -421,6 +429,106 @@ var Score = /** @class */ (function () {
 exports.Score = Score;
 
 },{}],6:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+var Vector_1 = require("./Vector");
+var Token = /** @class */ (function () {
+    function Token(tokenName, width, height, ctx, color, r, x, y) {
+        this.name = 'Token created sucessfully'; // debugin purpose
+        this.r = 30;
+        this.shootPrecision = 10;
+        //array of radius
+        this.arrR = [];
+        this.angle = 0;
+        this.ANGLE_VELOCITY = 0.05 - Math.random() * 0.1;
+        this.isMoving = false;
+        this.magnitude = 1 + (Math.random() * 1);
+        this.fontSize = '20';
+        this.fontType = 'Consolas';
+        this.tokenName = tokenName;
+        this.color = color;
+        this.worldWidth = width;
+        this.worldHeight = height;
+        var angle = Math.PI * 2 * Math.random();
+        this.pos = new Vector_1.Vector(Math.random() * width, Math.random() * height);
+        //if x or y  exists asign that else use the random value
+        this.r = r ? r : this.r;
+        this.pos.x = x ? x : this.pos.x;
+        this.pos.y = y ? y : this.pos.y;
+        this.velocity = new Vector_1.Vector(Math.cos(angle), Math.sin(angle));
+        this.velocity.multiplyBy(this.magnitude);
+        this.ctx = ctx;
+    }
+    Token.prototype.draw = function () {
+        this.ctx.save();
+        // save the unrotated context of the canvas so we can restore it later
+        this.ctx.translate(this.pos.x, this.pos.y);
+        //the rotation
+        this.ctx.rotate(this.angle);
+        // the outline
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = this.color;
+        // the circle
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, this.r, 0, 2 * Math.PI);
+        this.ctx.stroke();
+        // the fill color
+        this.ctx.fillStyle = this.color;
+        //the drawing
+        this.ctx.stroke();
+        this.ctx.fill();
+        //Draw the text
+        this.ctx.font = this.fontSize + " " + this.fontType;
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText(this.tokenName, -10, 10);
+        // we’re done with the rotating so restore the unrotated context
+        this.ctx.restore();
+    };
+    Token.prototype.update = function () {
+        this.pos.addTo(this.velocity);
+        this.angle += this.ANGLE_VELOCITY;
+        if (this.pos.x > this.worldWidth + this.r) {
+            this.pos.x = -this.r;
+        }
+        else if (this.pos.x < -this.r) {
+            this.pos.x = this.worldWidth + this.r;
+        }
+        else if (this.pos.y > this.worldHeight + this.r) {
+            this.pos.y = -this.r;
+        }
+        else if (this.pos.y < -this.r) {
+            this.pos.y = this.worldHeight + this.r;
+        }
+    };
+    Token.prototype.polygon = function (ctx, x, y, r, sides) {
+        if (sides < 3)
+            return;
+        var a = ((Math.PI * 2) / sides);
+        ctx.beginPath();
+        ;
+        ctx.translate(x, y);
+        ctx.moveTo(r[0], 0);
+        for (var i = 1; i < sides; i++) {
+            ctx.lineTo(r[i] * Math.cos(a * i), r[i] * Math.sin(a * i));
+        }
+        ctx.closePath();
+    };
+    Token.prototype["break"] = function (laser) {
+        var d = this.distance(laser.pos, this.pos);
+        return d <= this.r + this.shootPrecision;
+    };
+    Token.prototype.distance = function (v1, v2) {
+        return Math.sqrt(Math.pow((v1.x - v2.x), 2) + Math.pow((v1.y - v2.y), 2));
+    };
+    Token.prototype.resetPos = function () {
+        this.pos.x = -30 - Math.random() * 30;
+        this.pos.y = -30 - Math.random() * 30;
+    };
+    return Token;
+}());
+exports.Token = Token;
+
+},{"./Vector":7}],7:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector = /** @class */ (function () {
@@ -520,7 +628,7 @@ var Vector = /** @class */ (function () {
 }());
 exports.Vector = Vector;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Background = /** @class */ (function () {
@@ -557,7 +665,7 @@ var Background = /** @class */ (function () {
 }());
 exports.Background = Background;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Vector_1 = require("./Vector");
@@ -631,6 +739,7 @@ var Ship = /** @class */ (function () {
                 case 68:
                     _this.rotate(0.05);
                     break; // the 'w' key
+                // case 90: this.shoot(this.laserArr);break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };
@@ -643,8 +752,9 @@ var Ship = /** @class */ (function () {
         this.laserArr = arr;
     }
     Ship.prototype.draw = function () {
-        this.ctx.save();
         // save the unrotated context of the canvas so we can restore it later
+        this.ctx.save();
+        // translate the axis to this position
         this.ctx.translate(this.pos.x, this.pos.y);
         //the rotation
         this.ctx.rotate(this.angle);
@@ -659,7 +769,8 @@ var Ship = /** @class */ (function () {
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';
         // the fill color
-        this.ctx.fillStyle = "#FFCC00";
+        this.ctx.fillStyle = this.invencible ? '' : '#FFCC00';
+        // this.ctx.fillStyle = "#FFCC00";
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
@@ -737,7 +848,7 @@ var Ship = /** @class */ (function () {
         this.invencible = true;
     };
     return Ship;
-}());
+}()); //END SHIP CLASS
 exports.Ship = Ship;
 
-},{"./Laser":4,"./Vector":6}]},{},[1]);
+},{"./Laser":4,"./Vector":7}]},{},[1]);
