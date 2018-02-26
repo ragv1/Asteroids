@@ -124,6 +124,7 @@ function gameIntro(){
 function loadGame(newGame:boolean){
     if(newGame){createCanvas()}
     if(!newGame){
+        cancelAnimationFrame(idGameLoop);
         canvas.removeEventListener("click",restartGame);
         canvas.removeEventListener("keydown",togglePause);
         asteroids=[];

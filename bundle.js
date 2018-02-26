@@ -129,6 +129,7 @@ function loadGame(newGame) {
         createCanvas();
     }
     if (!newGame) {
+        cancelAnimationFrame(idGameLoop);
         canvas.removeEventListener("click", restartGame);
         canvas.removeEventListener("keydown", togglePause);
         asteroids = [];
@@ -713,6 +714,8 @@ var Ship = /** @class */ (function () {
         this.unableShip = false;
         this.FAKE_POS = { x: -2000, y: -2000 };
         this.invencible = false;
+        this.isShooting = false;
+        this.internalClock = 0;
         this.keyUpControls = function (e) {
             e.preventDefault();
             var code = e.keyCode;
@@ -742,7 +745,7 @@ var Ship = /** @class */ (function () {
                     _this.shoot(_this.laserArr);
                     break; //spacebar
                 case 90:
-                    _this.shoot(_this.laserArr);
+                    _this.fire(false);
                     break; // the 'z' key
                 default: console.log(code); //Everything else
             }
@@ -770,7 +773,9 @@ var Ship = /** @class */ (function () {
                 case 68:
                     _this.rotate(0.05);
                     break; // the 'w' key
-                // case 90: this.shoot(this.laserArr);break; // the 'z' key
+                case 90:
+                    _this.fire(true);
+                    break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };
@@ -833,6 +838,9 @@ var Ship = /** @class */ (function () {
         if (this.isMoving === true) {
             this.boost();
         }
+        if (this.isShooting === true) {
+            this.shoot(this.laserArr);
+        }
         //inherent ship friction
         this.velocity.multiplyBy(0.99);
     };
@@ -848,6 +856,7 @@ var Ship = /** @class */ (function () {
         this.velocity = new Vector_1.Vector(0, 0);
         this.angle = -Math.PI / 2;
         this.move(false);
+        this.fire(false);
         this.disableShip(5000 /*disable for 5 seconds*/);
     };
     //rotation movement functions
@@ -867,7 +876,13 @@ var Ship = /** @class */ (function () {
         this.isMoving = b;
     };
     Ship.prototype.shoot = function (arr) {
-        arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
+        this.internalClock++;
+        if (this.internalClock % 11 == 0) {
+            arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
+        }
+    };
+    Ship.prototype.fire = function (b) {
+        this.isShooting = b;
     };
     Ship.prototype.disableShip = function (timeMs) {
         var _this = this;

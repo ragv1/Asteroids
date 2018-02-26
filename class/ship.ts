@@ -18,6 +18,8 @@ export class Ship{
     public fakePos; // we use this to give invulnerability to the ship
     private FAKE_POS={x:-2000,y:-2000};
     private invencible=false;
+    private isShooting=false;
+    private internalClock=0;
     constructor(width:number,height:number,ctx:any,arr){
         this.worldWidth=width;
         this.worldHeight=height;
@@ -90,7 +92,7 @@ export class Ship{
         }
 
         if(this.isMoving===true){this.boost()}
-        
+        if(this.isShooting===true){this.shoot(this.laserArr)}
         //inherent ship friction
         this.velocity.multiplyBy(0.99);
     }
@@ -106,6 +108,7 @@ export class Ship{
         this.velocity=new Vector(0,0);
         this.angle= -Math.PI/2;
         this.move(false);
+        this.fire(false);
         this.disableShip(5000 /*disable for 5 seconds*/);
     }
 
@@ -126,7 +129,13 @@ export class Ship{
         this.isMoving=b;
     }
     shoot(arr){
-        arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r))
+        this.internalClock++;
+        if(this.internalClock%11==0){
+            arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r));
+        }
+    }
+    fire(b:boolean){
+        this.isShooting=b;
     }
     disableShip(timeMs:number){
         setTimeout(() => {
@@ -152,7 +161,7 @@ export class Ship{
 
             case 32: this.shoot(this.laserArr);break; //spacebar
             case 13: this.shoot(this.laserArr);break; //spacebar
-            case 90: this.shoot(this.laserArr);break; // the 'z' key
+            case 90: this.fire(false);break; // the 'z' key
             default: console.log(code); //Everything else
         }
         
@@ -169,7 +178,7 @@ export class Ship{
 
             case 39: this.rotate(0.05); break; //Right key
             case 68: this.rotate(0.05); break; // the 'w' key
-            // case 90: this.shoot(this.laserArr);break; // the 'z' key
+            case 90: this.fire(true);break; // the 'z' key
             default: console.log(code); //Everything else
         }
     }
