@@ -4,6 +4,8 @@ var ship_1 = require("./class/ship");
 var Asteroid_1 = require("./class/Asteroid");
 var Score_1 = require("./class/Score");
 var Intro_1 = require("./class/Intro");
+var background_1 = require("./class/background");
+var Tokens_1 = require("./class/Tokens");
 var width;
 var height;
 var ctx;
@@ -23,6 +25,12 @@ var endScreen;
 var endInfo;
 var level = 0;
 var frame = 0;
+var background;
+var shieldToken;
+function createBackground(context, width, height, starts) {
+    var bg = new background_1.Background(context, width, height, starts);
+    background = bg.draw();
+}
 function createCanvas() {
     canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'cnvs');
@@ -51,7 +59,7 @@ function createShip() {
     console.log(ship.name);
 }
 function createAsteroids(num) {
-    num = num ? num : 10;
+    // num= num? num:10;
     for (var i = 0; i < num; i++) {
         asteroids.push(new Asteroid_1.Asteroid(width, height, ctx));
     }
@@ -103,10 +111,12 @@ function loadGame(newGame) {
     if (!newGame) {
         canvas.removeEventListener("click", restartGame);
         asteroids = [];
+        laser = [];
     }
     setCanvasSize();
     canvas = document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
+    createBackground(ctx, width, height);
     createShip();
     attachEventListeners();
     createAsteroids(5);
@@ -116,26 +126,24 @@ function loadGame(newGame) {
     info2 = new Intro_1.Screen('30px', 'white', width / 6, height / 1.8, ctx, 'Use la tecla de Espacio para disparar');
     endScreen = new Intro_1.Screen('40px', 'red', width / 6, height / 3, ctx, 'Game Over');
     endInfo = new Intro_1.Screen('30px', 'yellow', width / 6, height / 2.6, ctx, 'Click to Restart');
+    shieldToken = new Tokens_1.Token('E', width, height, ctx, 'green');
     gameIntro();
 }
 function levelUp() {
-    level++;
     if (score.lives <= 100) {
         score.lives++;
     }
-    createAsteroids(level + 5);
+    createAsteroids(score.level + 5);
+    score.incrementLevel();
 }
 // THE GAME
 function gameLoop() {
     idGameLoop = requestAnimationFrame(gameLoop);
-    // frame++;
-    // console.log(Math.round(frame/60));
+    // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(background, 0, 0);
     //Chek for lives
-    // if(score.lives<=0){
-    //     endGame();
-    //  }
     for (var i = 0; i < asteroids.length; i++) {
         asteroids[i].draw();
         // asteroids[i].update();
@@ -157,7 +165,6 @@ function gameLoop() {
     if (asteroids.length < 1) {
         levelUp();
     }
-    //lasers drawing loop
     for (var i = laser.length - 1; i >= 0; i--) {
         laser[i].draw();
         laser[i].update();
@@ -176,15 +183,15 @@ function gameLoop() {
                 laser.splice(i, 1);
                 break;
             }
-            else if (asteroids[j].r <= 5) {
-                asteroids.splice(j, 1);
-                break;
-            }
         }
     }
+    // Ship drawing
     ship.draw();
     ship.update();
     ship.turn();
+    //Drawing the token
+    shieldToken.draw();
+    shieldToken.update();
     // Score Drawing and updating counter
     score.update();
 }

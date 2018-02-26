@@ -7,7 +7,7 @@ export class Ship{
     private acc:Vector;
     public pos:Vector;
     private ctx;
-    private r =20;
+    public r =10;
     public angle=-Math.PI/2;
     private ANGLE_VELOCITY=0;
     private isMoving=false;
@@ -15,10 +15,14 @@ export class Ship{
     private worldHeight;
     private laserArr:any[]=[];
     private unableShip:boolean=false;
+    public fakePos; // we use this to give invulnerability to the ship
+    private FAKE_POS={x:-2000,y:-2000};
+    private invencible=false;
     constructor(width:number,height:number,ctx:any,arr){
         this.worldWidth=width;
         this.worldHeight=height;
         this.pos = new Vector(width/2,height/2);
+        this.fakePos=this.pos;
         this.velocity= new Vector(0,0)
         this.ctx=ctx;
         this.laserArr=arr;
@@ -26,11 +30,12 @@ export class Ship{
 
 
     draw(){
-        this.ctx.save(); 
         // save the unrotated context of the canvas so we can restore it later
+        this.ctx.save(); 
+        
+        // translate the axis to this position
         this.ctx.translate(this.pos.x,this.pos.y);
 
-        
         //the rotation
         this.ctx.rotate(this.angle);
 
@@ -41,18 +46,29 @@ export class Ship{
         this.ctx.lineTo(-this.r,-this.r);
         this.ctx.lineTo(this.r,0);
         this.ctx.closePath();
+
         // the outline
         this.ctx.lineWidth = 10;
-        this.ctx.strokeStyle = '#666666';
+        this.ctx.strokeStyle ='#666666';
         
         // the fill color
-        this.ctx.fillStyle = "#FFCC00";
+        this.ctx.fillStyle =this.invencible?'':'#FFCC00';
+        // this.ctx.fillStyle = "#FFCC00";
         
-
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
 
+        //the impact zone
+        this.ctx.beginPath();
+        this.ctx.arc(0,0,this.r+10,0,2*Math.PI);
+
+        // the outline
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle =this.invencible?'#ff0000':'#666666';
+        this.ctx.closePath();
+        this.ctx.stroke();
+ 
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
     }
@@ -90,6 +106,7 @@ export class Ship{
         this.velocity=new Vector(0,0);
         this.angle= -Math.PI/2;
         this.move(false);
+        this.disableShip(5000 /*disable for 5 seconds*/);
     }
 
     //rotation movement functions
@@ -111,32 +128,51 @@ export class Ship{
     shoot(arr){
         arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r))
     }
-    disableShip(){
-        this.unableShip=true;
+    disableShip(timeMs:number){
+        setTimeout(() => {
+            this.fakePos=this.pos;
+            this.invencible=false;
+        }, timeMs);
+        this.fakePos=this.FAKE_POS;
+        this.invencible=true;
     }
     
     keyUpControls= (e) => {
+        e.preventDefault();
         var code = e.keyCode;
         switch (code) {
             case 37: this.rotate(0); break; //Left key
+            case 65: this.rotate(0); break; //the 'a' key
+            
             case 38: this.move(false); break; //Up key
+            case 87: this.move(false); break; //Up key
+
             case 39: this.rotate(0); break; //Right key
+            case 68: this.rotate(0); break; // the 'w' key
+
             case 32: this.shoot(this.laserArr);break; //spacebar
+            case 13: this.shoot(this.laserArr);break; //spacebar
             case 90: this.shoot(this.laserArr);break; // the 'z' key
             default: console.log(code); //Everything else
         }
         
     }
     keydownControls= (e) =>{
+        e.preventDefault();
         var code = e.keyCode;
         switch (code) {
             case 37: this.rotate(-0.05);; break; //Left key
+            case 65: this.rotate(-0.05); break; //the 'a' key
+
             case 38: this.move(true);   break; //Up key
+            case 87: this.move(true); break; //Up key
+
             case 39: this.rotate(0.05); break; //Right key
+            case 68: this.rotate(0.05); break; // the 'w' key
+            // case 90: this.shoot(this.laserArr);break; // the 'z' key
             default: console.log(code); //Everything else
         }
     }
 
 
-
-}
+}//END SHIP CLASS

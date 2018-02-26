@@ -6,25 +6,40 @@ var Ship = /** @class */ (function () {
     function Ship(width, height, ctx, arr) {
         var _this = this;
         this.name = 'Enterprise-SHIP: Created Sucessfuly'; // debugin purpose
-        this.r = 20;
+        this.r = 10;
         this.angle = -Math.PI / 2;
         this.ANGLE_VELOCITY = 0;
         this.isMoving = false;
         this.laserArr = [];
         this.unableShip = false;
+        this.FAKE_POS = { x: -2000, y: -2000 };
+        this.invencible = false;
         this.keyUpControls = function (e) {
+            e.preventDefault();
             var code = e.keyCode;
             switch (code) {
                 case 37:
                     _this.rotate(0);
                     break; //Left key
+                case 65:
+                    _this.rotate(0);
+                    break; //the 'a' key
                 case 38:
+                    _this.move(false);
+                    break; //Up key
+                case 87:
                     _this.move(false);
                     break; //Up key
                 case 39:
                     _this.rotate(0);
                     break; //Right key
+                case 68:
+                    _this.rotate(0);
+                    break; // the 'w' key
                 case 32:
+                    _this.shoot(_this.laserArr);
+                    break; //spacebar
+                case 13:
                     _this.shoot(_this.laserArr);
                     break; //spacebar
                 case 90:
@@ -34,31 +49,44 @@ var Ship = /** @class */ (function () {
             }
         };
         this.keydownControls = function (e) {
+            e.preventDefault();
             var code = e.keyCode;
             switch (code) {
                 case 37:
                     _this.rotate(-0.05);
                     ;
                     break; //Left key
+                case 65:
+                    _this.rotate(-0.05);
+                    break; //the 'a' key
                 case 38:
+                    _this.move(true);
+                    break; //Up key
+                case 87:
                     _this.move(true);
                     break; //Up key
                 case 39:
                     _this.rotate(0.05);
                     break; //Right key
+                case 68:
+                    _this.rotate(0.05);
+                    break; // the 'w' key
+                // case 90: this.shoot(this.laserArr);break; // the 'z' key
                 default: console.log(code); //Everything else
             }
         };
         this.worldWidth = width;
         this.worldHeight = height;
         this.pos = new Vector_1.Vector(width / 2, height / 2);
+        this.fakePos = this.pos;
         this.velocity = new Vector_1.Vector(0, 0);
         this.ctx = ctx;
         this.laserArr = arr;
     }
     Ship.prototype.draw = function () {
-        this.ctx.save();
         // save the unrotated context of the canvas so we can restore it later
+        this.ctx.save();
+        // translate the axis to this position
         this.ctx.translate(this.pos.x, this.pos.y);
         //the rotation
         this.ctx.rotate(this.angle);
@@ -73,10 +101,19 @@ var Ship = /** @class */ (function () {
         this.ctx.lineWidth = 10;
         this.ctx.strokeStyle = '#666666';
         // the fill color
-        this.ctx.fillStyle = "#FFCC00";
+        this.ctx.fillStyle = this.invencible ? '' : '#FFCC00';
+        // this.ctx.fillStyle = "#FFCC00";
         //the drawing
         this.ctx.stroke();
         this.ctx.fill();
+        //the impact zone
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, this.r + 10, 0, 2 * Math.PI);
+        // the outline
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = this.invencible ? '#ff0000' : '#666666';
+        this.ctx.closePath();
+        this.ctx.stroke();
         // we’re done with the rotating so restore the unrotated context
         this.ctx.restore();
     };
@@ -112,6 +149,7 @@ var Ship = /** @class */ (function () {
         this.velocity = new Vector_1.Vector(0, 0);
         this.angle = -Math.PI / 2;
         this.move(false);
+        this.disableShip(5000 /*disable for 5 seconds*/);
     };
     //rotation movement functions
     Ship.prototype.turn = function () {
@@ -132,9 +170,15 @@ var Ship = /** @class */ (function () {
     Ship.prototype.shoot = function (arr) {
         arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
     };
-    Ship.prototype.disableShip = function () {
-        this.unableShip = true;
+    Ship.prototype.disableShip = function (timeMs) {
+        var _this = this;
+        setTimeout(function () {
+            _this.fakePos = _this.pos;
+            _this.invencible = false;
+        }, timeMs);
+        this.fakePos = this.FAKE_POS;
+        this.invencible = true;
     };
     return Ship;
-}());
+}()); //END SHIP CLASS
 exports.Ship = Ship;

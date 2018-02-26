@@ -3,6 +3,8 @@ import { Asteroid } from "./class/Asteroid";
 import { Laser } from "./class/Laser";
 import { Score } from "./class/Score";
 import { Screen  } from "./class/Intro";
+import { Background } from "./class/background";
+import { Token } from "./class/Tokens";
 var width;
 var height;
 var ctx;
@@ -22,7 +24,12 @@ var endScreen:Screen;
 var endInfo:Screen;
 var level:number=0;
 var frame=0;
-
+var background;
+var shieldToken;
+function createBackground(context,width,height,starts?){
+    let bg = new Background(context,width,height,starts);
+    background = bg.draw();
+}
 function createCanvas(){
     canvas = <HTMLCanvasElement>document.createElement('canvas');
     canvas.setAttribute('id','cnvs');
@@ -51,7 +58,7 @@ function createShip(){
     console.log(ship.name);
 }
 function createAsteroids(num){
-    num= num? num:10;
+    // num= num? num:10;
     for (let i = 0; i < num; i++) {
         asteroids.push(new Asteroid(width,height,ctx) );
     }
@@ -101,10 +108,12 @@ function loadGame(newGame:boolean){
     if(!newGame){
         canvas.removeEventListener("click",restartGame);
         asteroids=[];
+        laser=[];
     }
     setCanvasSize();
     canvas = <HTMLCanvasElement>document.getElementById('cnvs');
     ctx = canvas.getContext("2d");
+    createBackground(ctx,width,height);
     createShip();
     attachEventListeners();
     createAsteroids(5);
@@ -114,25 +123,28 @@ function loadGame(newGame:boolean){
     info2= new Screen('30px','white',width/6,height/1.8,ctx,'Use la tecla de Espacio para disparar');
     endScreen=new Screen('40px','red',width/6,height/3,ctx,'Game Over');
     endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
+    shieldToken= new Token('E',width,height,ctx,'green');
     gameIntro();
 }
 function levelUp(){
-    level++;
     if(score.lives<=100){ 
         score.lives++;
     }
-    createAsteroids(level+5);
+    createAsteroids(score.level+5);
+    score.incrementLevel();
 
 }
 // THE GAME
 function gameLoop() {
-   idGameLoop= requestAnimationFrame(gameLoop);
-    // frame++;
-    // console.log(Math.round(frame/60));
-
+    idGameLoop= requestAnimationFrame(gameLoop);
+    
+    // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(background,0,0);
+    
     //Chek for lives
+<<<<<<< HEAD
     // if(score.lives<=0){
     //     endGame();
     //  }
@@ -157,8 +169,36 @@ function gameLoop() {
     }
     //Check if the level is completed
     if(asteroids.length<1){ levelUp();}
+=======
+    if(score.lives<=0){
+        endGame();
+    }
+    
+    //Asteroids drawing, breaking loop
+    for (let i = asteroids.length-1; i >= 0; i--) {
+        if(asteroids[i].r<=5){asteroids.splice(i,1);continue;}
+        asteroids[i].draw();
+        asteroids[i].update();
+        if( asteroids[i].hit(ship.fakePos,ship.r) ){
+            if(score.lives<=0){
+                endGame();
+            }else{
+                let copyAsteroid = asteroids[i];
+                copyAsteroid.resetPos();
+                asteroids.splice(i,1);
+                ship.reset();
+                asteroids.push(copyAsteroid);
+                score.reduce();
+            }
+ 
+        }
+        
+    }
+    //Check if the level is completed
+    if(asteroids.length<1){ levelUp();ship.reset()}
+>>>>>>> gh-pages
 
-    //lasers drawing loop
+    //lasers drawing loop, increase score
     for (let i = laser.length-1; i >=0; i--) {
         laser[i].draw();
         laser[i].update();
@@ -175,16 +215,16 @@ function gameLoop() {
             } else if(laser[i].outSide()){
                 laser.splice(i,1);
                 break;
-            }else if(asteroids[j].r<=5){            // asteroid minimum size
-                asteroids.splice(j,1);
-                break;
             }
         }
     }
-   
+    // Ship drawing
     ship.draw();
     ship.update();
     ship.turn();
+    //Drawing the token
+    shieldToken.draw();
+    shieldToken.update();
     // Score Drawing and updating counter
     score.update();
  }
