@@ -144,32 +144,6 @@ function gameLoop() {
     ctx.drawImage(background,0,0);
     
     //Chek for lives
-<<<<<<< HEAD
-    // if(score.lives<=0){
-    //     endGame();
-    //  }
-   
-    for (let i = 0; i < asteroids.length; i++) {
-        asteroids[i].draw();
-        // asteroids[i].update();
-        // if( asteroids[i].hit(ship.pos) ){
-        //     if(score.lives<=0){
-        //         endGame();
-        //     }else{
-        //         let copyAsteroid = asteroids[i];
-        //         copyAsteroid.resetPos();
-        //         asteroids.splice(i,1);
-        //         ship.reset();
-        //         asteroids.push(copyAsteroid);
-        //         score.reduce();
-        //         break;
-        //     }
-            
-        // }
-    }
-    //Check if the level is completed
-    if(asteroids.length<1){ levelUp();}
-=======
     if(score.lives<=0){
         endGame();
     }
@@ -196,7 +170,6 @@ function gameLoop() {
     }
     //Check if the level is completed
     if(asteroids.length<1){ levelUp();ship.reset()}
->>>>>>> gh-pages
 
     //lasers drawing loop, increase score
     for (let i = laser.length-1; i >=0; i--) {

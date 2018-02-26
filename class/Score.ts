@@ -1,7 +1,6 @@
 export class Score{
     public score:number=0;
     public lives:number=5;
-    private level:number=1;
     private fontSize;
     private fontType
     private worldWidth;
@@ -9,11 +8,7 @@ export class Score{
     private ctx;
     private color;
     private unableScore:boolean=false;
-<<<<<<< HEAD
-    
-=======
     public level:number=1;
->>>>>>> gh-pages
 
     constructor(fontSize:string, fontType:string, color:string, worldWidth:number, worldHeight:number,ctx) {
         this.fontSize = fontSize;

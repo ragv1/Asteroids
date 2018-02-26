@@ -144,27 +144,37 @@ function gameLoop() {
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(background, 0, 0);
     //Chek for lives
-    for (var i = 0; i < asteroids.length; i++) {
+    if (score.lives <= 0) {
+        endGame();
+    }
+    //Asteroids drawing, breaking loop
+    for (var i = asteroids.length - 1; i >= 0; i--) {
+        if (asteroids[i].r <= 5) {
+            asteroids.splice(i, 1);
+            continue;
+        }
         asteroids[i].draw();
-        // asteroids[i].update();
-        // if( asteroids[i].hit(ship.pos) ){
-        //     if(score.lives<=0){
-        //         endGame();
-        //     }else{
-        //         let copyAsteroid = asteroids[i];
-        //         copyAsteroid.resetPos();
-        //         asteroids.splice(i,1);
-        //         ship.reset();
-        //         asteroids.push(copyAsteroid);
-        //         score.reduce();
-        //         break;
-        //     }
-        // }
+        asteroids[i].update();
+        if (asteroids[i].hit(ship.fakePos, ship.r)) {
+            if (score.lives <= 0) {
+                endGame();
+            }
+            else {
+                var copyAsteroid = asteroids[i];
+                copyAsteroid.resetPos();
+                asteroids.splice(i, 1);
+                ship.reset();
+                asteroids.push(copyAsteroid);
+                score.reduce();
+            }
+        }
     }
     //Check if the level is completed
     if (asteroids.length < 1) {
         levelUp();
+        ship.reset();
     }
+    //lasers drawing loop, increase score
     for (var i = laser.length - 1; i >= 0; i--) {
         laser[i].draw();
         laser[i].update();
