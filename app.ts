@@ -18,15 +18,17 @@ var introScreen:Screen;
 var idAnimation;
 var idGameLoop;
 var idGameOver;
-var paused;
+var paused=false;
 var info:Screen;
 var info2:Screen;
+var info3:Screen;
 var endScreen:Screen;
 var endInfo:Screen;
 var level:number=0;
 var frame=0;
 var background;
 var shieldToken;
+var togglePause;
 function createBackground(context,width,height,starts?){
     let bg = new Background(context,width,height,starts);
     background = bg.draw();
@@ -52,13 +54,6 @@ function attachEventListeners(){
     canvas.addEventListener("keydown",ship.keydownControls);
     canvas.addEventListener("keyup",ship.keyUpControls);
     canvas.addEventListener("click",startGame);
-    canvas.addEventListener('keydown', function (e) {
-        var key = e.keyCode;
-        if (key === 80)// p key
-        {
-            togglePause();
-        }
-        })
 //  console.log(canvas );
 }
 function createShip(){
@@ -77,39 +72,41 @@ function createScore(fontSize:string,fontType:string,color:string,width:number,h
 }
 function endGame(){
     cancelAnimationFrame(idGameLoop);
-    score.disableScore();
-    ship.reset();
     canvas.removeEventListener("keydown",ship.keydownControls);
     canvas.removeEventListener("keyup",ship.keyUpControls);
+    canvas.removeEventListener("click",startGame);
+    canvas.removeEventListener("keydown",togglePause); paused=false;
+    score.disableScore();
+    ship.reset();
     canvas.addEventListener("click",restartGame);
     gameOver();
     return true;
 }
 function restartGame(){
-    cancelAnimationFrame(idGameOver);
     loadGame(false);
 }
 function gameOver(){
-    idGameOver= requestAnimationFrame(gameOver);
+    // idGameOver= requestAnimationFrame(gameOver);
     endScreen.draw();
     endInfo.draw();
 }
 function startGame(){
     canvas.removeEventListener("click",startGame);
     cancelAnimationFrame(idAnimation);
+    canvas.addEventListener('keydown', togglePause)// this has to be added here because this method call gameLoop() directly and can not be called any where else
     gameLoop();
 }
-function togglePause()
-{
-    if (!paused)
-    {
-        paused = true;
-    } else if (paused)
-    {
-       paused= false;
-       gameLoop();
+togglePause=(e)=>{
+    let key = e.keyCode;
+    if (key === 80){// p key
+        if (!paused){
+            paused = true;
+        } else if (paused){
+           paused= false;
+           gameLoop();
+        }
     }
-
+    
 }
 function gameIntro(){
     idAnimation = requestAnimationFrame(gameIntro);
@@ -122,11 +119,13 @@ function gameIntro(){
     introScreen.draw();
     info.draw();
     info2.draw();
+    info3.draw();
 }
 function loadGame(newGame:boolean){
     if(newGame){createCanvas()}
     if(!newGame){
         canvas.removeEventListener("click",restartGame);
+        canvas.removeEventListener("keydown",togglePause);
         asteroids=[];
         laser=[];
     }
@@ -135,16 +134,17 @@ function loadGame(newGame:boolean){
     ctx = canvas.getContext("2d");
     createBackground(ctx,width,height);
     createShip();
-    attachEventListeners();
     createAsteroids(5);
     createScore('30px','Consolas','white',width,height,ctx);
     introScreen=new Screen('40px','red',width/6,height/3,ctx,'Click en la pantalla para empezar');
     info= new Screen('30px','white',width/6,height/2,ctx,'Use las flechas para Moverse');
     info2= new Screen('30px','white',width/6,height/1.8,ctx,'Use la tecla de Espacio para disparar');
+    info3= new Screen('30px','white',width/6,height/1.65,ctx,'Use la tecla P para Pausar');
     endScreen=new Screen('40px','red',width/6,height/3,ctx,'Game Over');
     endInfo =new Screen('30px','yellow',width/6,height/2.6,ctx,'Click to Restart');
     shieldToken= new Token('E',width,height,ctx,'green');
     gameIntro();
+    attachEventListeners();
 }
 function levelUp(){
     if(score.lives<=100){ 
@@ -152,17 +152,14 @@ function levelUp(){
     }
     createAsteroids(score.level+5);
     score.incrementLevel();
-
+}
+function pausedScreen(){
+    ctx.font ="60px Consolas"
+    ctx.fillStyle = "orange";
+    ctx.fillText('Pausa', (width-160)/2,height/2);
 }
 // THE GAME
 function gameLoop() {
-    if(!paused){ 
-        idGameLoop= requestAnimationFrame(gameLoop);
-        console.log('Game Paused?: ',paused);
-        
-    }
- 
-    
     // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
@@ -225,6 +222,12 @@ function gameLoop() {
     shieldToken.update();
     // Score Drawing and updating counter
     score.update();
+
+    if(paused){ 
+        pausedScreen(); //SHOW THE PAUSED SCREEN
+    }else{
+        idGameLoop= requestAnimationFrame(gameLoop);
+    }
  }
 
 //Preload necesary stuff for the game
