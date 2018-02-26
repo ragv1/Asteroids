@@ -19,6 +19,7 @@ var introScreen;
 var idAnimation;
 var idGameLoop;
 var idGameOver;
+var paused;
 var info;
 var info2;
 var endScreen;
@@ -52,6 +53,12 @@ function attachEventListeners() {
     canvas.addEventListener("keydown", ship.keydownControls);
     canvas.addEventListener("keyup", ship.keyUpControls);
     canvas.addEventListener("click", startGame);
+    canvas.addEventListener('keydown', function (e) {
+        var key = e.keyCode;
+        if (key === 80) {
+            togglePause();
+        }
+    });
     //  console.log(canvas );
 }
 function createShip() {
@@ -91,6 +98,15 @@ function startGame() {
     canvas.removeEventListener("click", startGame);
     cancelAnimationFrame(idAnimation);
     gameLoop();
+}
+function togglePause() {
+    if (!paused) {
+        paused = true;
+    }
+    else if (paused) {
+        paused = false;
+        gameLoop();
+    }
 }
 function gameIntro() {
     idAnimation = requestAnimationFrame(gameIntro);
@@ -138,7 +154,10 @@ function levelUp() {
 }
 // THE GAME
 function gameLoop() {
-    idGameLoop = requestAnimationFrame(gameLoop);
+    if (!paused) {
+        idGameLoop = requestAnimationFrame(gameLoop);
+        console.log('Game Paused?: ', paused);
+    }
     // Draw the background
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
