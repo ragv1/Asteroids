@@ -739,11 +739,11 @@ var Ship = /** @class */ (function () {
                     _this.rotate(0);
                     break; // the 'w' key
                 case 32:
-                    _this.shoot(_this.laserArr);
+                    _this.fire(false);
                     break; //spacebar
                 case 13:
-                    _this.shoot(_this.laserArr);
-                    break; //spacebar
+                    _this.fire(false);
+                    break; //enter
                 case 90:
                     _this.fire(false);
                     break; // the 'z' key
@@ -773,6 +773,12 @@ var Ship = /** @class */ (function () {
                 case 68:
                     _this.rotate(0.05);
                     break; // the 'w' key
+                case 32:
+                    _this.fire(true);
+                    break; //spacebar
+                case 13:
+                    _this.fire(true);
+                    break; //enter
                 case 90:
                     _this.fire(true);
                     break; // the 'z' key
@@ -839,7 +845,7 @@ var Ship = /** @class */ (function () {
             this.boost();
         }
         if (this.isShooting === true) {
-            this.shoot(this.laserArr);
+            this.shootFull(this.laserArr);
         }
         //inherent ship friction
         this.velocity.multiplyBy(0.99);
@@ -857,7 +863,7 @@ var Ship = /** @class */ (function () {
         this.angle = -Math.PI / 2;
         this.move(false);
         this.fire(false);
-        this.disableShip(5000 /*disable for 5 seconds*/);
+        this.disableShip(3000 /*disable for 5 seconds*/);
     };
     //rotation movement functions
     Ship.prototype.turn = function () {
@@ -875,11 +881,14 @@ var Ship = /** @class */ (function () {
     Ship.prototype.move = function (b) {
         this.isMoving = b;
     };
-    Ship.prototype.shoot = function (arr) {
+    Ship.prototype.shootFull = function (arr) {
         this.internalClock++;
-        if (this.internalClock % 11 == 0) {
+        if (this.internalClock % 13 == 0) {
             arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
         }
+    };
+    Ship.prototype.shoot = function (arr) {
+        arr.push(new Laser_1.Laser(this.worldWidth, this.worldHeight, this.ctx, this.pos, this.angle, this.r));
     };
     Ship.prototype.fire = function (b) {
         this.isShooting = b;

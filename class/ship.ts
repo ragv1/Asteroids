@@ -92,7 +92,7 @@ export class Ship{
         }
 
         if(this.isMoving===true){this.boost()}
-        if(this.isShooting===true){this.shoot(this.laserArr)}
+        if(this.isShooting===true){this.shootFull(this.laserArr)}
         //inherent ship friction
         this.velocity.multiplyBy(0.99);
     }
@@ -109,7 +109,7 @@ export class Ship{
         this.angle= -Math.PI/2;
         this.move(false);
         this.fire(false);
-        this.disableShip(5000 /*disable for 5 seconds*/);
+        this.disableShip(3000 /*disable for 5 seconds*/);
     }
 
     //rotation movement functions
@@ -128,11 +128,14 @@ export class Ship{
     move(b:boolean){
         this.isMoving=b;
     }
-    shoot(arr){
+    shootFull(arr){
         this.internalClock++;
-        if(this.internalClock%11==0){
+        if(this.internalClock%13==0){
             arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r));
         }
+    }
+    shoot(arr){
+        arr.push(new Laser(this.worldWidth,this.worldHeight,this.ctx,this.pos,this.angle,this.r));
     }
     fire(b:boolean){
         this.isShooting=b;
@@ -159,8 +162,8 @@ export class Ship{
             case 39: this.rotate(0); break; //Right key
             case 68: this.rotate(0); break; // the 'w' key
 
-            case 32: this.shoot(this.laserArr);break; //spacebar
-            case 13: this.shoot(this.laserArr);break; //spacebar
+            case 32: this.fire(false);break; //spacebar
+            case 13: this.fire(false);break; //enter
             case 90: this.fire(false);break; // the 'z' key
             default: console.log(code); //Everything else
         }
@@ -178,6 +181,9 @@ export class Ship{
 
             case 39: this.rotate(0.05); break; //Right key
             case 68: this.rotate(0.05); break; // the 'w' key
+
+            case 32: this.fire(true);break; //spacebar
+            case 13: this.fire(true);break; //enter
             case 90: this.fire(true);break; // the 'z' key
             default: console.log(code); //Everything else
         }
